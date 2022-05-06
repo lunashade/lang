@@ -1,0 +1,17 @@
+services:
+  sh:
+    pull_policy: build
+    build:
+      context: .
+    volumes:
+      - ./:/lang
+
+  test:
+    pull_policy: build
+    build:
+      context: .
+    volumes:
+      - ./:/lang
+    entrypoint:
+      - make
+      - test
