@@ -6,7 +6,7 @@ function check {
     want=$1
     input=$2
 
-    ${TARGET} "$input" | lli
+    echo "$input" | ${TARGET} | lli
     got=$?
     if [[ "$want" != "$got" ]]; then
         echo "input: {$input}, want: ${want} but got: ${got}";
@@ -18,6 +18,8 @@ function check {
 function main {
     echo "target: ${TARGET}"
     check 0 "0"
+    check 1 "1"
+    check 255 "255"
     echo ok
 }
 
