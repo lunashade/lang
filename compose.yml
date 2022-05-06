@@ -15,3 +15,13 @@ services:
     entrypoint:
       - make
       - test
+
+  emit:
+    pull_policy: build
+    build:
+      context: .
+    volumes:
+      - ./:/lang
+    entrypoint:
+      - sandbox/emit.sh
+      - sandbox/code.c
