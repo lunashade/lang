@@ -3,6 +3,8 @@ package token
 import (
 	"strings"
 	"testing"
+
+	"github.com/lunashade/lang/internal/token/kind"
 )
 
 func TestLex(t *testing.T) {
@@ -15,26 +17,26 @@ func TestLex(t *testing.T) {
 			name: "number",
 			input: "1",
 			want: []Token{
-				{Kind: Integer, sval: "1"},
-				{Kind: Eof, sval: ""},
+				{Kind: kind.Integer, sval: "1"},
+				{Kind: kind.Eof, sval: ""},
 			},
 		},
 		{
 			name: "number with skip",
 			input: "255\n\n",
 			want: []Token{
-				{Kind: Integer, sval: "255"},
-				{Kind: Eof, sval: ""},
+				{Kind: kind.Integer, sval: "255"},
+				{Kind: kind.Eof, sval: ""},
 			},
 		},
 		{
 			name: "numbers",
 			input: "255\t\n78\n361\n",
 			want: []Token{
-				{Kind: Integer, sval: "255"},
-				{Kind: Integer, sval: "78"},
-				{Kind: Integer, sval: "361"},
-				{Kind: Eof, sval: ""},
+				{Kind: kind.Integer, sval: "255"},
+				{Kind: kind.Integer, sval: "78"},
+				{Kind: kind.Integer, sval: "361"},
+				{Kind: kind.Eof, sval: ""},
 			},
 		},
 	}

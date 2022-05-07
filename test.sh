@@ -20,6 +20,8 @@ function main {
     check 0 "0"
     check 1 "1"
     check 255 "255"
+    check 255 "  255  "
+    check 78 "78  65"
     echo ok
 }
 

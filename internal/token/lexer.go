@@ -4,6 +4,8 @@ import (
 	"bufio"
 	"errors"
 	"io"
+
+	"github.com/lunashade/lang/internal/token/kind"
 )
 
 func Lex(r io.Reader) chan Token {
@@ -56,7 +58,7 @@ func (l *lexer) peek() rune {
 	return c
 }
 
-func (l *lexer) emit(kind Kind) {
+func (l *lexer) emit(kind kind.Kind) {
 	tok := makeToken(kind, string(l.buf))
 	l.ch <- tok
 	l.buf = nil
@@ -79,7 +81,7 @@ func lexSkip(l *lexer) stateFn {
 			break
 		}
 	}
-	l.emit(Eof)
+	l.emit(kind.Eof)
 	return nil
 }
 
@@ -92,7 +94,7 @@ func lexNumber(l *lexer) stateFn {
 		}
 		l.buf = append(l.buf, c)
 	}
-	l.emit(Integer)
+	l.emit(kind.Integer)
 	return lexSkip
 }
 
