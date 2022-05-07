@@ -4,7 +4,6 @@ import (
 	"github.com/lunashade/lang/internal/token/kind"
 )
 
-
 type Token struct {
 	Kind kind.Kind
 	sval string
