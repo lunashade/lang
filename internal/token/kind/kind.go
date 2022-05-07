@@ -4,8 +4,7 @@ package kind
 type Kind int
 
 const (
-	Skip Kind = iota
-	Eof
+	Eof Kind = iota
 	Integer
 	Punctuation
 )
