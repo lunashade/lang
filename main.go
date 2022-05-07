@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"strconv"
 	"strings"
+
+	"github.com/lunashade/lang/internal/token"
 )
 
 func main() {
@@ -15,15 +16,17 @@ func main() {
 		panic("cannot read stdin")
 	}
 	code := string(b)
-
-	num, err := strconv.Atoi(strings.TrimSuffix(code, "\n"))
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err.Error())
-		panic("unknown integer")
-	}
+	tokens := token.Lex(strings.NewReader(code))
 
 	fmt.Printf("define dso_local i32 @main() #0 {\n")
-	fmt.Printf("\tret i32 %d\n", num)
+	for tok := range tokens {
+		if tok.Kind == token.Eof {
+			break
+		}
+		if tok.Kind == token.Integer {
+			fmt.Printf("\tret i32 %s\n", tok)
+		}
+	}
 	fmt.Printf("}\n")
 	return
 }
