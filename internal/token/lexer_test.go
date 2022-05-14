@@ -41,11 +41,11 @@ func TestLex(t *testing.T) {
 		{
 			"symbol", "+-*/+",
 			[]Token{
-				{Kind: kind.Symbol, sval: "+"},
-				{Kind: kind.Symbol, sval: "-"},
-				{Kind: kind.Symbol, sval: "*"},
-				{Kind: kind.Symbol, sval: "/"},
-				{Kind: kind.Symbol, sval: "+"},
+				{Kind: kind.Plus, sval: "+"},
+				{Kind: kind.Minus, sval: "-"},
+				{Kind: kind.Multiply, sval: "*"},
+				{Kind: kind.Divide, sval: "/"},
+				{Kind: kind.Plus, sval: "+"},
 				{Kind: kind.Eof, sval: ""},
 			},
 		},
@@ -53,9 +53,9 @@ func TestLex(t *testing.T) {
 			"symbol with numbers", "255 + 78* 361",
 			[]Token{
 				{Kind: kind.Integer, sval: "255"},
-				{Kind: kind.Symbol, sval: "+"},
+				{Kind: kind.Plus, sval: "+"},
 				{Kind: kind.Integer, sval: "78"},
-				{Kind: kind.Symbol, sval: "*"},
+				{Kind: kind.Multiply, sval: "*"},
 				{Kind: kind.Integer, sval: "361"},
 				{Kind: kind.Eof, sval: ""},
 			},

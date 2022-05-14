@@ -11,7 +11,7 @@ func lexSkip(l *lexer) stateFn {
 			return lexNumber
 		}
 		if isSymbol(c) {
-			return lexOp
+			return lexSymbol
 		}
 
 		if l.next() == eof {
@@ -35,11 +35,22 @@ func lexNumber(l *lexer) stateFn {
 	return lexSkip
 }
 
-// lexOp consume punctuation symbol with single character
+// lexSymbol consume punctuation symbol with single character
 // TODO: support multi character
-func lexOp(l *lexer) stateFn {
+func lexSymbol(l *lexer) stateFn {
 	c := l.next()
 	l.buf = append(l.buf, c)
-	l.emit(kind.Symbol)
+	switch c {
+	case '+':
+		l.emit(kind.Plus)
+	case '-':
+		l.emit(kind.Minus)
+	case '*':
+		l.emit(kind.Multiply)
+	case '/':
+		l.emit(kind.Divide)
+	default:
+		panic("unknown symbol")
+	}
 	return lexSkip
 }

@@ -6,5 +6,9 @@ type Kind int
 const (
 	Eof Kind = iota
 	Integer
-	Symbol
+	// Symbol
+	Plus
+	Minus
+	Multiply
+	Divide
 )
