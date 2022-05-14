@@ -15,25 +15,22 @@ func TestLex(t *testing.T) {
 	}{
 		// number
 		{
-			name:  "number",
-			input: "1",
-			want: []Token{
+			"number", "1",
+			[]Token{
 				{Kind: kind.Integer, sval: "1"},
 				{Kind: kind.Eof, sval: ""},
 			},
 		},
 		{
-			name:  "number with skip",
-			input: "255\n\n",
-			want: []Token{
+			"number with skip", "255\n\n",
+			[]Token{
 				{Kind: kind.Integer, sval: "255"},
 				{Kind: kind.Eof, sval: ""},
 			},
 		},
 		{
-			name:  "numbers",
-			input: "255\t\n78\n361\n",
-			want: []Token{
+			"numbers", "255\t\n78\n361\n",
+			[]Token{
 				{Kind: kind.Integer, sval: "255"},
 				{Kind: kind.Integer, sval: "78"},
 				{Kind: kind.Integer, sval: "361"},
@@ -42,9 +39,8 @@ func TestLex(t *testing.T) {
 		},
 		// punct
 		{
-			name:  "punctuations",
-			input: "+-*/+",
-			want: []Token{
+			"symbol", "+-*/+",
+			[]Token{
 				{Kind: kind.Symbol, sval: "+"},
 				{Kind: kind.Symbol, sval: "-"},
 				{Kind: kind.Symbol, sval: "*"},
@@ -54,9 +50,8 @@ func TestLex(t *testing.T) {
 			},
 		},
 		{
-			name:  "punctuations with numbers",
-			input: "255 + 78* 361",
-			want: []Token{
+			"symbol with numbers", "255 + 78* 361",
+			[]Token{
 				{Kind: kind.Integer, sval: "255"},
 				{Kind: kind.Symbol, sval: "+"},
 				{Kind: kind.Integer, sval: "78"},
@@ -66,6 +61,7 @@ func TestLex(t *testing.T) {
 			},
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(
 			tt.name,
