@@ -8,8 +8,10 @@ function check {
 
     echo "$input" | ${TARGET} | lli
     got=$?
-    if [[ "$want" != "$got" ]]; then
-        echo "input: {$input}, want: ${want} but got: ${got}";
+    if [[ "$want" == "$got" ]]; then
+        echo "[SUCCESS] ${input} => ${got}"
+    else
+        echo "[FAIL] ${input} => ${want} but ${got}";
         exit 1;
     fi
 }
