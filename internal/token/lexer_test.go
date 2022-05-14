@@ -67,16 +67,21 @@ func TestLex(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		got := Lex(strings.NewReader(tt.input))
-		for i, tok := range tt.want {
-			g, ok := <-got
-			if !ok {
-				t.Fatalf("%s: closed before finish", tt.name)
-			}
-			if g.Kind != tok.Kind || g.sval != tok.sval {
-				t.Errorf("%s(%d): want %v, got %v", tt.name, i, tok, g)
-			}
-		}
+		t.Run(
+			tt.name,
+			func(t *testing.T) {
+				got := Lex(strings.NewReader(tt.input))
+				for i, tok := range tt.want {
+					g, ok := <-got
+					if !ok {
+						t.Fatalf("closed before finish")
+					}
+					if g.Kind != tok.Kind || g.sval != tok.sval {
+						t.Errorf("(%d): want %v, got %v", i, tok, g)
+					}
+				}
+			},
+		)
 	}
 
 }
