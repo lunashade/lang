@@ -4,7 +4,9 @@ package kind
 type Kind int
 
 const (
-	Eof Kind = iota
+	Invalid Kind = iota
+	Eof
+	// Literal
 	Integer
 	// Symbol
 	Plus
