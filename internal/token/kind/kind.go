@@ -6,5 +6,5 @@ type Kind int
 const (
 	Eof Kind = iota
 	Integer
-	Punctuation
+	Symbol
 )

@@ -10,7 +10,7 @@ func lexSkip(l *lexer) stateFn {
 		if isDigit(c) {
 			return lexNumber
 		}
-		if isPunctuation(c) {
+		if isSymbol(c) {
 			return lexOp
 		}
 
@@ -40,6 +40,6 @@ func lexNumber(l *lexer) stateFn {
 func lexOp(l *lexer) stateFn {
 	c := l.next()
 	l.buf = append(l.buf, c)
-	l.emit(kind.Punctuation)
+	l.emit(kind.Symbol)
 	return lexSkip
 }
