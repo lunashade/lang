@@ -1,12 +1,15 @@
 #!/bin/bash
 # test script for lang
 TARGET=$1  # target executable
+TMPDIR=tmp/
+mkdir $TMPDIR
 
 function check {
     want=$1
     input=$2
 
-    echo "$input" | ${TARGET} | lli
+    echo "$input" | ${TARGET} > $TMPDIR/tmp.ll
+    cat $TMPDIR/tmp.ll | lli
     got=$?
     if [[ "$want" == "$got" ]]; then
         echo "[SUCCESS] ${input} => ${got}"
@@ -23,7 +26,10 @@ function main {
     check 1 "1"
     check 255 "255"
     check 255 "  255  "
-    check 78 "78  65"
+    check 2 "1+1"
+    check 6 "2*3"
+    check 7 "1+2*3"
+    check 8 "280 / 20 - 2 * 3"
     echo ok
 }
 

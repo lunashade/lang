@@ -1,24 +1,21 @@
 package compile
 
 import (
-	"fmt"
 	"io"
 
+	"github.com/lunashade/lang/internal/gen"
+	"github.com/lunashade/lang/internal/parse"
 	"github.com/lunashade/lang/internal/token"
-	"github.com/lunashade/lang/internal/token/kind"
 )
 
 func Run(r io.Reader, w io.Writer) {
 	tokens := token.Lex(r)
-
-	fmt.Fprintf(w, "define dso_local i32 @main() #0 {\n")
-	for tok := range tokens {
-		if tok.Kind == kind.Eof {
-			break
-		}
-		if tok.Kind == kind.Integer {
-			fmt.Fprintf(w, "\tret i32 %s\n", tok)
-		}
+	node, err := parse.Run(tokens)
+	if err != nil {
+		panic(err)
 	}
-	fmt.Fprintf(w, "}\n")
+	err = gen.Run(w, node)
+	if err != nil {
+		panic(err)
+	}
 }
