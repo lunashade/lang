@@ -89,11 +89,7 @@ func (p *Parser) Root(pos int) (ast.AST, error) {
 }
 
 func (p *Parser) Expr(pos int) (int, ast.AST, error) {
-	nx, node, err := p.Sum(pos)
-	if err != nil {
-		return pos, nil, err
-	}
-	return nx, &ast.Expr{Node: node}, nil
+	return p.Sum(pos)
 }
 
 func (p *Parser) Sum(pos int) (int, ast.AST, error) {

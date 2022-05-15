@@ -78,8 +78,7 @@ func TestParseExpr(t *testing.T) {
 			ch := token.Lex(strings.NewReader(tt.input))
 			node, _ := Run(ch)
 			root := node.(*ast.Root)
-			expr := root.Nodes[0].(*ast.Expr)
-			got := expr.Node
+			got := root.Nodes[0]
 			assert.DeepEqual(t, tt.want, got)
 		})
 	}
