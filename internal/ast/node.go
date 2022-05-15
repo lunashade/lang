@@ -2,8 +2,22 @@ package ast
 
 type AST interface{}
 
-type Int struct{ Value int }
-type Add struct{ LHS, RHS AST }
-type Sub struct{ LHS, RHS AST }
-type Mul struct{ LHS, RHS AST }
-type Div struct{ LHS, RHS AST }
+type Root struct {
+	Nodes []AST
+}
+
+type Int struct {
+	Value int
+}
+
+type BinOp struct {
+	Type     BinOpType
+	LHS, RHS AST
+}
+type BinOpType int
+const (
+	Add BinOpType = iota + 1
+	Sub
+	Mul
+	Div
+)

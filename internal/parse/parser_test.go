@@ -18,39 +18,45 @@ func TestParse(t *testing.T) {
 	}{
 		{
 			"1+1", "1+1",
-			&ast.Add{
-				LHS: &ast.Int{Value: 1},
-				RHS: &ast.Int{Value: 1},
+			&ast.BinOp{
+				Type: ast.Add,
+				LHS:  &ast.Int{Value: 1},
+				RHS:  &ast.Int{Value: 1},
 			},
 		},
 		{
 			"1-1", "1-1",
-			&ast.Sub{
-				LHS: &ast.Int{Value: 1},
-				RHS: &ast.Int{Value: 1},
+			&ast.BinOp{
+				Type: ast.Sub,
+				LHS:  &ast.Int{Value: 1},
+				RHS:  &ast.Int{Value: 1},
 			},
 		},
 		{
 			"1*1", "1*1",
-			&ast.Mul{
-				LHS: &ast.Int{Value: 1},
-				RHS: &ast.Int{Value: 1},
+			&ast.BinOp{
+				Type: ast.Mul,
+				LHS:  &ast.Int{Value: 1},
+				RHS:  &ast.Int{Value: 1},
 			},
 		},
 		{
 			"1/1", "1/1",
-			&ast.Div{
-				LHS: &ast.Int{Value: 1},
-				RHS: &ast.Int{Value: 1},
+			&ast.BinOp{
+				Type: ast.Div,
+				LHS:  &ast.Int{Value: 1},
+				RHS:  &ast.Int{Value: 1},
 			},
 		},
 		{
 			"1+1*1", "1+1*1",
-			&ast.Add{
-				LHS: &ast.Int{Value: 1},
-				RHS: &ast.Mul{
-					LHS: &ast.Int{Value: 1},
-					RHS: &ast.Int{Value: 1},
+			&ast.BinOp{
+				Type: ast.Add,
+				LHS:  &ast.Int{Value: 1},
+				RHS: &ast.BinOp{
+					Type: ast.Mul,
+					LHS:  &ast.Int{Value: 1},
+					RHS:  &ast.Int{Value: 1},
 				},
 			},
 		},
@@ -58,7 +64,7 @@ func TestParse(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			ch := token.Lex(strings.NewReader(tt.input))
-			got := Run(ch)
+			got, _ := Run(ch)
 			assert.DeepEqual(t, tt.want, got)
 		})
 	}
