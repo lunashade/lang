@@ -15,10 +15,7 @@ type Parser struct {
 }
 
 func Run(ch chan token.Token) (ast.AST, error) {
-	p := &Parser{
-		ch:     ch,
-		tokens: make([]token.Token, 0),
-	}
+	p := &Parser{ch: ch}
 	node, err := p.Root(0)
 	if err != nil {
 		return nil, err
@@ -58,7 +55,7 @@ func (p *Parser) Consume(kind kind.Kind, at int) (int, *token.Token) {
 	if t == nil || t.Kind != kind {
 		return at, nil
 	}
-	return at + 1, p.look(at)
+	return at + 1, t
 }
 
 func (p *Parser) Skip(kind kind.Kind) NonTerminal {
@@ -125,7 +122,8 @@ func (p *Parser) Sub(pos int) (int, ast.AST, error) {
 func (p *Parser) Mul(pos int) (int, ast.AST, error) {
 	return p.Concat(
 		func(nodes []ast.AST) ast.AST {
-			return &ast.BinOp{Type: ast.Mul, LHS: nodes[0], RHS: nodes[2]}
+			return &ast.BinOp{
+				Type: ast.Mul, LHS: nodes[0], RHS: nodes[2]}
 		},
 		p.Term,
 		p.Skip(kind.Multiply),
@@ -136,7 +134,8 @@ func (p *Parser) Mul(pos int) (int, ast.AST, error) {
 func (p *Parser) Div(pos int) (int, ast.AST, error) {
 	return p.Concat(
 		func(nodes []ast.AST) ast.AST {
-			return &ast.BinOp{Type: ast.Div, LHS: nodes[0], RHS: nodes[2]}
+			return &ast.BinOp{
+				Type: ast.Div, LHS: nodes[0], RHS: nodes[2]}
 		},
 		p.Term,
 		p.Skip(kind.Divide),
