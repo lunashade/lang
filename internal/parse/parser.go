@@ -78,14 +78,22 @@ func (p *Parser) Skip(kind kind.Kind) NonTerminal {
 // [Div] <- Term "/" Prod
 // Term <- Integer
 func (p *Parser) Root(pos int) (ast.AST, error) {
-	_, node, err := p.Sum(0)
+	_, node, err := p.Expr(0)
 	if err != nil {
 		return nil, err
 	}
 	if !p.ateof {
 		return nil, errors.New("not at eof")
 	}
-	return node, nil
+	return &ast.Root{Nodes: []ast.AST{node}}, nil
+}
+
+func (p *Parser) Expr(pos int) (int, ast.AST, error) {
+	nx, node, err := p.Sum(pos)
+	if err != nil {
+		return pos, nil, err
+	}
+	return nx, &ast.Expr{Node: node}, nil
 }
 
 func (p *Parser) Sum(pos int) (int, ast.AST, error) {

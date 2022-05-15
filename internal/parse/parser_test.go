@@ -10,7 +10,7 @@ import (
 	"github.com/lunashade/lang/internal/token"
 )
 
-func TestParse(t *testing.T) {
+func TestParseExpr(t *testing.T) {
 	tests := []struct {
 		name  string
 		input string
@@ -76,7 +76,10 @@ func TestParse(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			ch := token.Lex(strings.NewReader(tt.input))
-			got, _ := Run(ch)
+			node, _ := Run(ch)
+			root := node.(*ast.Root)
+			expr := root.Nodes[0].(*ast.Expr)
+			got := expr.Node
 			assert.DeepEqual(t, tt.want, got)
 		})
 	}

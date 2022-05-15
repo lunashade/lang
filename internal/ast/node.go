@@ -6,6 +6,10 @@ type Root struct {
 	Nodes []AST
 }
 
+type Expr struct {
+	Node AST
+}
+
 type Int struct {
 	Value int
 }
@@ -15,6 +19,7 @@ type BinOp struct {
 	LHS, RHS AST
 }
 type BinOpType int
+
 const (
 	Add BinOpType = iota + 1
 	Sub
