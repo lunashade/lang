@@ -14,16 +14,16 @@ type Parser struct {
 	ateof  bool
 }
 
-func Run(ch chan token.Token) ast.AST {
+func Run(ch chan token.Token) (ast.AST, error) {
 	p := &Parser{
 		ch:     ch,
 		tokens: make([]token.Token, 0),
 	}
 	node, err := p.Root(0)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
-	return node
+	return node, nil
 }
 
 // next reads next token from channel
@@ -82,11 +82,11 @@ func (p *Parser) Skip(kind kind.Kind) NonTerminal {
 // Term <- Integer
 func (p *Parser) Root(pos int) (ast.AST, error) {
 	_, node, err := p.Sum(0)
-	if !p.ateof {
-		panic("not at eof")
-	}
 	if err != nil {
-		panic(err)
+		return nil, err
+	}
+	if !p.ateof {
+		return nil, errors.New("not at eof")
 	}
 	return node, nil
 }
@@ -149,7 +149,7 @@ func (p *Parser) Term(pos int) (int, ast.AST, error) {
 func (p *Parser) Integer(pos int) (int, ast.AST, error) {
 	nx, t := p.Consume(kind.Integer, pos)
 	if t == nil {
-		return pos, nil, errors.New("not an integer")
+		return pos, nil, errors.New("not an integer token")
 	}
 	return nx, &ast.Int{Value: t.IntValue()}, nil
 }
