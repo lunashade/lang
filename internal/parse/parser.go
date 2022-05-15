@@ -14,6 +14,18 @@ type Parser struct {
 	ateof  bool
 }
 
+func Run(ch chan token.Token) ast.AST {
+	p := &Parser{
+		ch:     ch,
+		tokens: make([]token.Token, 0),
+	}
+	node, err := p.Root(0)
+	if err != nil {
+		panic(err)
+	}
+	return node
+}
+
 // next reads next token from channel
 func (p *Parser) next() {
 	if p.ateof {
@@ -25,8 +37,9 @@ func (p *Parser) next() {
 		p.ateof = true
 	}
 	p.tokens = append(p.tokens, tok)
-
 }
+
+// look at the token at the position
 func (p *Parser) look(at int) *token.Token {
 	if at < len(p.tokens) {
 		return &(p.tokens[at])
@@ -58,18 +71,6 @@ func (p *Parser) Skip(kind kind.Kind) NonTerminal {
 	}
 }
 
-func Parse(ch chan token.Token) ast.AST {
-	p := &Parser{
-		ch:     ch,
-		tokens: make([]token.Token, 0),
-	}
-	node, err := p.Root(0)
-	if err != nil {
-		panic(err)
-	}
-	return node
-}
-
 // PEG
 // Root <- Add
 // Sum <- Add / Sub / Prod
@@ -88,45 +89,6 @@ func (p *Parser) Root(pos int) (ast.AST, error) {
 		panic(err)
 	}
 	return node, nil
-}
-
-type NonTerminal func(int) (int, ast.AST, error)
-
-func (p *Parser) Select(cands ...NonTerminal) NonTerminal {
-	return func(pos int) (int, ast.AST, error) {
-		var nx int
-		var node ast.AST
-		var err error
-		for _, cand := range cands {
-			nx, node, err = cand(pos)
-			if err == nil {
-				return nx, node, nil
-			}
-		}
-		// TODO: wraps error
-		return pos, nil, err
-	}
-}
-
-type Merger func([]ast.AST) ast.AST
-
-func (p *Parser) Concat(m Merger, cands ...NonTerminal) NonTerminal {
-	return func(pos int) (int, ast.AST, error) {
-		var nx int = pos
-		var node ast.AST
-		var err error
-
-		nodes := make([]ast.AST, 0)
-		for _, cand := range cands {
-			nx, node, err = cand(nx)
-			if err != nil {
-				return pos, nil, err
-			}
-			nodes = append(nodes, node)
-		}
-		return nx, m(nodes), nil
-	}
-
 }
 
 func (p *Parser) Sum(pos int) (int, ast.AST, error) {
@@ -183,6 +145,7 @@ func (p *Parser) Div(pos int) (int, ast.AST, error) {
 func (p *Parser) Term(pos int) (int, ast.AST, error) {
 	return p.Select(p.Integer)(pos)
 }
+
 func (p *Parser) Integer(pos int) (int, ast.AST, error) {
 	nx, t := p.Consume(kind.Integer, pos)
 	if t == nil {

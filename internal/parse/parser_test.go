@@ -58,7 +58,7 @@ func TestParse(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			ch := token.Lex(strings.NewReader(tt.input))
-			got := Parse(ch)
+			got := Run(ch)
 			assert.DeepEqual(t, tt.want, got)
 		})
 	}
