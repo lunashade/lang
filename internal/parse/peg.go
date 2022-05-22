@@ -2,6 +2,7 @@ package parse
 
 import (
 	"errors"
+	"strconv"
 
 	"github.com/lunashade/lang/internal/ast"
 	"github.com/lunashade/lang/internal/token/kind"
@@ -108,5 +109,9 @@ func (p *Parser) Integer(pos int) (int, ast.AST, error) {
 	if t == nil {
 		return pos, nil, errors.New("not an integer token")
 	}
-	return nx, &ast.Int{Value: t.IntValue()}, nil
+	val, err := strconv.Atoi(t.Sval)
+	if err != nil {
+		return pos, nil, err
+	}
+	return nx, &ast.Int{Value: int64(val)}, nil
 }
