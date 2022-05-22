@@ -13,6 +13,9 @@ func lexSkip(l *lexer) stateFn {
 		if isSymbol(c) {
 			return lexSymbol
 		}
+		if isIdent(c) {
+			return lexIdent
+		}
 		if l.next() == eof {
 			break
 		}
@@ -33,9 +36,20 @@ func lexNumber(l *lexer) stateFn {
 	l.emit(kind.Integer)
 	return lexSkip
 }
+func lexIdent(l *lexer) stateFn {
+	for {
+		c := l.next()
+		if !isIdent(c) {
+			break
+		}
+		l.buf = append(l.buf, c)
+	}
+	l.backup()
+	l.emit(kind.Identifier)
+	return lexSkip
+}
 
 // lexSymbol consume punctuation symbol with single character
-// TODO: support multi character
 func lexSymbol(l *lexer) stateFn {
 	c := l.next()
 	l.buf = append(l.buf, c)

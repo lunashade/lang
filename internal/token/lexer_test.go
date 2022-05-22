@@ -73,6 +73,14 @@ func TestLex(t *testing.T) {
 				{Kind: kind.Eof, Sval: ""},
 			},
 		},
+		{
+			"identifier", "abc efg",
+			[]Token{
+				{Kind: kind.Identifier, Sval: "abc"},
+				{Kind: kind.Identifier, Sval: "efg"},
+				{Kind: kind.Eof, Sval: ""},
+			},
+		},
 	}
 
 	for _, tt := range tests {
