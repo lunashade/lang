@@ -24,7 +24,7 @@ func (t Token) String() string {
 	return t.sval
 }
 
-func (t Token) IntValue() int {
+func (t Token) IntValue() int64 {
 	if t.Kind != kind.Integer {
 		return 0
 	}
@@ -32,5 +32,5 @@ func (t Token) IntValue() int {
 	if err != nil {
 		panic(err)
 	}
-	return val
+	return int64(val)
 }

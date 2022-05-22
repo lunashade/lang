@@ -11,7 +11,7 @@ type Expr struct {
 }
 
 type Int struct {
-	Value int
+	Value int64
 }
 
 type BinOp struct {
