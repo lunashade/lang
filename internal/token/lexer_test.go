@@ -60,6 +60,19 @@ func TestLex(t *testing.T) {
 				{Kind: kind.Eof, sval: ""},
 			},
 		},
+		{
+			"paren", "1 + (2 * 3)",
+			[]Token{
+				{Kind: kind.Integer, sval: "1"},
+				{Kind: kind.Plus, sval: "+"},
+				{Kind: kind.LParen, sval: "("},
+				{Kind: kind.Integer, sval: "2"},
+				{Kind: kind.Multiply, sval: "*"},
+				{Kind: kind.Integer, sval: "3"},
+				{Kind: kind.RParen, sval: ")"},
+				{Kind: kind.Eof, sval: ""},
+			},
+		},
 	}
 
 	for _, tt := range tests {

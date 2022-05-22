@@ -1,12 +1,14 @@
 package token
 
+import "github.com/lunashade/lang/internal/token/kind"
+
+
 func isDigit(c rune) bool {
 	return '0' <= c && c <= '9'
 }
 
 func isSymbol(c rune) bool {
-	puncts := "+-*/"
-	for _, r := range puncts {
+	for _, r := range kind.Symbols {
 		if c == r {
 			return true
 		}

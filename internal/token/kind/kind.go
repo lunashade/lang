@@ -9,8 +9,21 @@ const (
 	// Literal
 	Integer
 	// Symbol
-	Plus
-	Minus
-	Multiply
-	Divide
+	Plus     // '+'
+	Minus    // '-'
+	Multiply // '*'
+	Divide   // '/'
+	LParen   // '('
+	RParen   // ')'
 )
+
+const Symbols = "+-*/()"
+
+func SymbolKind(c rune) Kind {
+	for i, r := range Symbols {
+		if r == c {
+			return Kind(i + int(Plus))
+		}
+	}
+	return Invalid
+}

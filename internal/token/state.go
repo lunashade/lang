@@ -13,7 +13,6 @@ func lexSkip(l *lexer) stateFn {
 		if isSymbol(c) {
 			return lexSymbol
 		}
-
 		if l.next() == eof {
 			break
 		}
@@ -40,17 +39,10 @@ func lexNumber(l *lexer) stateFn {
 func lexSymbol(l *lexer) stateFn {
 	c := l.next()
 	l.buf = append(l.buf, c)
-	switch c {
-	case '+':
-		l.emit(kind.Plus)
-	case '-':
-		l.emit(kind.Minus)
-	case '*':
-		l.emit(kind.Multiply)
-	case '/':
-		l.emit(kind.Divide)
-	default:
+	k := kind.SymbolKind(c)
+	if k == kind.Invalid {
 		panic("unknown symbol")
 	}
+	l.emit(k)
 	return lexSkip
 }
