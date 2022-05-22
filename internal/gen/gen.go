@@ -49,10 +49,7 @@ func (g *Generator) walk(node ast.AST) error {
 func (g *Generator) expr(node ast.AST) (value.Value, error) {
 	switch nd := node.(type) {
 	case *ast.Int:
-		val := constant.NewInt(types.I32, nd.Value)
-		alloc := g.curBlock.NewAlloca(types.I32)
-		g.curBlock.NewStore(val, alloc)
-		return g.curBlock.NewLoad(types.I32, alloc), nil
+		return constant.NewInt(types.I32, nd.Value), nil
 	case *ast.BinOp:
 		return g.binOp(nd)
 	default:
