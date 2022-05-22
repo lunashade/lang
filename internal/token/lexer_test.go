@@ -65,11 +65,11 @@ func TestLex(t *testing.T) {
 			[]Token{
 				{Kind: kind.Integer, sval: "1"},
 				{Kind: kind.Plus, sval: "+"},
-				{Kind: kind.LParen, sval: "("},
+				{Kind: kind.LeftParen, sval: "("},
 				{Kind: kind.Integer, sval: "2"},
 				{Kind: kind.Multiply, sval: "*"},
 				{Kind: kind.Integer, sval: "3"},
-				{Kind: kind.RParen, sval: ")"},
+				{Kind: kind.RightParen, sval: ")"},
 				{Kind: kind.Eof, sval: ""},
 			},
 		},

@@ -97,9 +97,9 @@ func (p *Parser) ParenExpr(pos int) (int, ast.AST, error) {
 		func(nodes []ast.AST) ast.AST {
 			return nodes[1]
 		},
-		p.Skip(kind.LParen),
+		p.Skip(kind.LeftParen),
 		p.Expr,
-		p.Skip(kind.RParen),
+		p.Skip(kind.RightParen),
 	)(pos)
 }
 

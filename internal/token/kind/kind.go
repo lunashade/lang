@@ -6,18 +6,24 @@ type Kind int
 const (
 	Invalid Kind = iota
 	Eof
+	Identifier
+	Keyword
 	// Literal
 	Integer
+	String
 	// Symbol
-	Plus     // '+'
-	Minus    // '-'
-	Multiply // '*'
-	Divide   // '/'
-	LParen   // '('
-	RParen   // ')'
+	Plus        // '+'
+	Minus       // '-'
+	Multiply    // '*'
+	Divide      // '/'
+	LeftParen   // '('
+	RightParen  // ')'
+	Assign      // '='
+	LessThan    // '<'
+	GreaterThan // '>'
 )
 
-const Symbols = "+-*/()"
+const Symbols = "+-*/()=<>"
 
 func SymbolKind(c rune) Kind {
 	for i, r := range Symbols {
