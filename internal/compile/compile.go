@@ -1,6 +1,7 @@
 package compile
 
 import (
+	"fmt"
 	"io"
 
 	"github.com/lunashade/lang/internal/gen"
@@ -12,10 +13,10 @@ func Run(r io.Reader, w io.Writer) {
 	tokens := token.Lex(r)
 	node, err := parse.Run(tokens)
 	if err != nil {
-		panic(err)
+		panic(fmt.Errorf("parse error: %w", err))
 	}
 	err = gen.Run(w, node)
 	if err != nil {
-		panic(err)
+		panic(fmt.Errorf("codegen error: %w", err))
 	}
 }
