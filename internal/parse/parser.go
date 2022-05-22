@@ -69,14 +69,16 @@ func (p *Parser) Skip(kind kind.Kind) NonTerminal {
 }
 
 // PEG
-// Root <- Add
+// Root <- Expr
+// Expr <- Sum
 // Sum <- Add / Sub / Prod
 // [Add] <- Prod "+" Sum
 // [Sub] <- Prod "-" Sum
 // Prod <- Mul / Div / Term
 // [Mul] <- Term "*" Prod
 // [Div] <- Term "/" Prod
-// Term <- Integer
+// Term <- ParenExpr / Integer
+// [ParenExpr] <- "(" Expr ")"
 func (p *Parser) Root(pos int) (ast.AST, error) {
 	_, node, err := p.Expr(0)
 	if err != nil {
@@ -148,8 +150,20 @@ func (p *Parser) Div(pos int) (int, ast.AST, error) {
 }
 
 func (p *Parser) Term(pos int) (int, ast.AST, error) {
-	return p.Select(p.Integer)(pos)
+	return p.Select(p.ParenExpr, p.Integer)(pos)
 }
+
+func (p *Parser) ParenExpr(pos int) (int, ast.AST, error) {
+	return p.Concat(
+		func(nodes []ast.AST) ast.AST {
+			return nodes[1]
+		},
+		p.Skip(kind.LParen),
+		p.Expr,
+		p.Skip(kind.RParen),
+	)(pos)
+}
+
 
 func (p *Parser) Integer(pos int) (int, ast.AST, error) {
 	nx, t := p.Consume(kind.Integer, pos)

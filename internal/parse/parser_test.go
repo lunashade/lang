@@ -12,12 +12,11 @@ import (
 
 func TestParseExpr(t *testing.T) {
 	tests := []struct {
-		name  string
 		input string
 		want  ast.AST
 	}{
 		{
-			"1+1", "1+1",
+			"1+1",
 			&ast.BinOp{
 				Type: ast.Add,
 				LHS:  &ast.Int{Value: 1},
@@ -25,7 +24,7 @@ func TestParseExpr(t *testing.T) {
 			},
 		},
 		{
-			"1-1", "1-1",
+			"1-1",
 			&ast.BinOp{
 				Type: ast.Sub,
 				LHS:  &ast.Int{Value: 1},
@@ -33,7 +32,7 @@ func TestParseExpr(t *testing.T) {
 			},
 		},
 		{
-			"1*1", "1*1",
+			"1*1",
 			&ast.BinOp{
 				Type: ast.Mul,
 				LHS:  &ast.Int{Value: 1},
@@ -41,7 +40,7 @@ func TestParseExpr(t *testing.T) {
 			},
 		},
 		{
-			"1/1", "1/1",
+			"1/1",
 			&ast.BinOp{
 				Type: ast.Div,
 				LHS:  &ast.Int{Value: 1},
@@ -49,7 +48,7 @@ func TestParseExpr(t *testing.T) {
 			},
 		},
 		{
-			"1+1*1", "1+1*1",
+			"1+1*1",
 			&ast.BinOp{
 				Type: ast.Add,
 				LHS:  &ast.Int{Value: 1},
@@ -61,7 +60,7 @@ func TestParseExpr(t *testing.T) {
 			},
 		},
 		{
-			"1+1+1", "1+1+1",
+			"1+1+1",
 			&ast.BinOp{
 				Type: ast.Add,
 				LHS:  &ast.Int{Value: 1},
@@ -72,9 +71,21 @@ func TestParseExpr(t *testing.T) {
 				},
 			},
 		},
+		{
+			"2*(3+4)",
+			&ast.BinOp{
+				Type: ast.Mul,
+				LHS:  &ast.Int{Value: 2},
+				RHS: &ast.BinOp{
+					Type: ast.Add,
+					LHS:  &ast.Int{Value: 3},
+					RHS:  &ast.Int{Value: 4},
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
+		t.Run(tt.input, func(t *testing.T) {
 			ch := token.Lex(strings.NewReader(tt.input))
 			node, _ := Run(ch)
 			root := node.(*ast.Root)

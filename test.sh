@@ -30,6 +30,7 @@ function main {
     check 6 "2*3"
     check 7 "1+2*3"
     check 8 "280 / 20 - 2 * 3"
+    check 14 "2 * (3 + 4)"
     echo ok
 }
 
