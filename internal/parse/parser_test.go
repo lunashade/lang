@@ -1,6 +1,7 @@
 package parse
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 
@@ -86,10 +87,13 @@ func TestParseExpr(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {
-			ch := token.Lex(strings.NewReader(tt.input))
+			input := fmt.Sprintf("main(){%s}", tt.input)
+			ch := token.Lex(strings.NewReader(input))
 			node, _ := Run(ch)
 			root := node.(*ast.Root)
-			got := root.Nodes[0]
+			fn := root.Nodes[0].(*ast.Function)
+			body := fn.Body.(*ast.ExprStmt)
+			got := body.Expr
 			assert.DeepEqual(t, tt.want, got)
 		})
 	}

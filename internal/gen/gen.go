@@ -31,26 +31,51 @@ func Run(w io.Writer, tree ast.AST) error {
 func (g *Generator) walk(node ast.AST) error {
 	switch nd := node.(type) {
 	case *ast.Root:
-		var val value.Value
-		var err error
-		fn := g.m.NewFunc("main", types.I32)
-		g.funcStack.Push(fn)
-		blk := g.funcStack.Top().NewBlock("")
-		g.blockStack.Push(blk)
-		for _, expr := range nd.Nodes {
-			val, err = g.expr(expr)
+		for _, node := range nd.Nodes {
+			err := g.walk(node)
 			if err != nil {
 				return err
 			}
 		}
-		g.blockStack.Top().NewRet(val)
+		return nil
+	case *ast.Function:
+		name := nd.Name.(*ast.Ident)
+		ty := types.I32
+		fn := g.m.NewFunc(name.Name, ty)
+		g.funcStack.Push(fn)
+		blk := g.funcStack.Top().NewBlock("")
+		g.blockStack.Push(blk)
+		body := nd.Body.(ast.Stmt)
+		val, err := g.stmt(body)
+		if err != nil {
+			return err
+		}
+		if val != nil {
+			g.blockStack.Top().NewRet(val)
+		} else {
+			g.blockStack.Top().NewRet(constant.NewInt(ty, 0))
+		}
 		g.blockStack.Pop()
 		g.funcStack.Pop()
 	}
 	return nil
 }
 
-func (g *Generator) expr(node ast.AST) (value.Value, error) {
+func (g *Generator) stmt(node ast.Stmt) (value.Value, error) {
+	switch nd := node.(type) {
+	case *ast.ExprStmt:
+		expr := nd.Expr.(ast.Expr)
+		return g.expr(expr)
+	case *ast.Semi:
+		expr := nd.Expr.(ast.Expr)
+		_, err := g.expr(expr)
+		return nil, err
+	default:
+		return nil, errors.New("unknown statement")
+	}
+}
+
+func (g *Generator) expr(node ast.Expr) (value.Value, error) {
 	switch nd := node.(type) {
 	case *ast.Int:
 		return constant.NewInt(types.I32, nd.Value), nil
@@ -62,11 +87,15 @@ func (g *Generator) expr(node ast.AST) (value.Value, error) {
 }
 
 func (g *Generator) binOp(node *ast.BinOp) (value.Value, error) {
-	lhs, err := g.expr(node.LHS)
+	// TODO: remove type assertion
+	// LHS, RHS must be expr so solve this in parse section
+	lhsNode := node.LHS.(ast.Expr)
+	lhs, err := g.expr(lhsNode)
 	if err != nil {
 		return nil, err
 	}
-	rhs, err := g.expr(node.RHS)
+	rhsNode := node.RHS.(ast.Expr)
+	rhs, err := g.expr(rhsNode)
 	if err != nil {
 		return nil, err
 	}

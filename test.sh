@@ -22,15 +22,15 @@ function check {
 
 function main {
     echo "target: ${TARGET}"
-    check 0 "0"
-    check 1 "1"
-    check 255 "255"
-    check 255 "  255  "
-    check 2 "1+1"
-    check 6 "2*3"
-    check 7 "1+2*3"
-    check 8 "280 / 20 - 2 * 3"
-    check 14 "2 * (3 + 4)"
+    check 0 "main(){0}"
+    check 1 "main(){1}"
+    check 255 "main(){255}"
+    check 2 "main(){1+1}"
+    check 6 "main(){2*3}"
+    check 7 "main(){ 1+2*3 }"
+    check 8 "main(){ 280 / 20 - 2 * 3 }"
+    check 14 "main(){ 2 * (3 + 4) }"
+    check 0 "main(){10;}"
     echo ok
 }
 

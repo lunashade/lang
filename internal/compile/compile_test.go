@@ -7,7 +7,9 @@ import (
 )
 
 const sample string = `
-1 + 1
+main(){
+	1 + 1
+}
 `
 
 func TestCompile(t *testing.T) {

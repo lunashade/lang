@@ -81,6 +81,20 @@ func TestLex(t *testing.T) {
 				{Kind: kind.Eof, Sval: ""},
 			},
 		},
+		{
+			"simple function", "main(){1+1} ",
+			[]Token{
+				{Kind: kind.Identifier, Sval: "main"},
+				{Kind: kind.LeftParen, Sval: "("},
+				{Kind: kind.RightParen, Sval: ")"},
+				{Kind: kind.LeftBrace, Sval: "{"},
+				{Kind: kind.Integer, Sval: "1"},
+				{Kind: kind.Plus, Sval: "+"},
+				{Kind: kind.Integer, Sval: "1"},
+				{Kind: kind.RightBrace, Sval: "}"},
+				{Kind: kind.Eof, Sval: ""},
+			},
+		},
 	}
 
 	for _, tt := range tests {
