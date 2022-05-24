@@ -12,9 +12,9 @@ import (
 )
 
 type Generator struct {
-	m        *ir.Module
-	curFunc  *ir.Func
-	curBlock *ir.Block
+	m          *ir.Module
+	funcStack  Stack[ir.Func]
+	blockStack Stack[ir.Block]
 }
 
 func Run(w io.Writer, tree ast.AST) error {
@@ -33,15 +33,19 @@ func (g *Generator) walk(node ast.AST) error {
 	case *ast.Root:
 		var val value.Value
 		var err error
-		g.curFunc = g.m.NewFunc("main", types.I32)
-		g.curBlock = g.curFunc.NewBlock("")
+		fn := g.m.NewFunc("main", types.I32)
+		g.funcStack.Push(fn)
+		blk := g.funcStack.Top().NewBlock("")
+		g.blockStack.Push(blk)
 		for _, expr := range nd.Nodes {
 			val, err = g.expr(expr)
 			if err != nil {
 				return err
 			}
 		}
-		g.curBlock.NewRet(val)
+		g.blockStack.Top().NewRet(val)
+		g.blockStack.Pop()
+		g.funcStack.Pop()
 	}
 	return nil
 }
@@ -69,16 +73,16 @@ func (g *Generator) binOp(node *ast.BinOp) (value.Value, error) {
 
 	switch node.Kind {
 	case ast.Add:
-		res := g.curBlock.NewAdd(lhs, rhs)
+		res := g.blockStack.Top().NewAdd(lhs, rhs)
 		return res, nil
 	case ast.Sub:
-		res := g.curBlock.NewSub(lhs, rhs)
+		res := g.blockStack.Top().NewSub(lhs, rhs)
 		return res, nil
 	case ast.Mul:
-		res := g.curBlock.NewMul(lhs, rhs)
+		res := g.blockStack.Top().NewMul(lhs, rhs)
 		return res, nil
 	case ast.Div:
-		res := g.curBlock.NewSDiv(lhs, rhs)
+		res := g.blockStack.Top().NewSDiv(lhs, rhs)
 		return res, nil
 	}
 	return nil, errors.New("unknown operator")
