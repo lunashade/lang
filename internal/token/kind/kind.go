@@ -16,14 +16,17 @@ const (
 	Minus       // '-'
 	Multiply    // '*'
 	Divide      // '/'
+	Assign      // '='
 	LeftParen   // '('
 	RightParen  // ')'
-	Assign      // '='
+	LeftBrace   // '{'
+	RightBrace  // '}'
 	LessThan    // '<'
 	GreaterThan // '>'
+	Semicolon   // ';'
 )
 
-const Symbols = "+-*/()=<>"
+const Symbols = "+-*/=(){}<>;"
 
 func SymbolKind(c rune) Kind {
 	for i, r := range Symbols {
