@@ -15,13 +15,13 @@ type Int struct {
 }
 
 type BinOp struct {
-	Type     BinOpType
+	Kind     BinOpKind
 	LHS, RHS AST
 }
-type BinOpType int
+type BinOpKind int
 
 const (
-	Add BinOpType = iota + 1
+	Add BinOpKind = iota + 1
 	Sub
 	Mul
 	Div

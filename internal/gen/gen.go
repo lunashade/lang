@@ -67,7 +67,7 @@ func (g *Generator) binOp(node *ast.BinOp) (value.Value, error) {
 		return nil, err
 	}
 
-	switch node.Type {
+	switch node.Kind {
 	case ast.Add:
 		res := g.curBlock.NewAdd(lhs, rhs)
 		return res, nil

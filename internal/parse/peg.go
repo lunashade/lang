@@ -45,7 +45,7 @@ func (p *Parser) Add(pos int) (int, ast.AST, error) {
 	return p.Concat(
 		func(nodes []ast.AST) ast.AST {
 			return &ast.BinOp{
-				Type: ast.Add, LHS: nodes[0], RHS: nodes[2]}
+				Kind: ast.Add, LHS: nodes[0], RHS: nodes[2]}
 		},
 		p.Prod,
 		p.Skip(kind.Plus),
@@ -57,7 +57,7 @@ func (p *Parser) Sub(pos int) (int, ast.AST, error) {
 	return p.Concat(
 		func(nodes []ast.AST) ast.AST {
 			return &ast.BinOp{
-				Type: ast.Sub, LHS: nodes[0], RHS: nodes[2]}
+				Kind: ast.Sub, LHS: nodes[0], RHS: nodes[2]}
 		},
 		p.Prod,
 		p.Skip(kind.Minus),
@@ -69,7 +69,7 @@ func (p *Parser) Mul(pos int) (int, ast.AST, error) {
 	return p.Concat(
 		func(nodes []ast.AST) ast.AST {
 			return &ast.BinOp{
-				Type: ast.Mul, LHS: nodes[0], RHS: nodes[2]}
+				Kind: ast.Mul, LHS: nodes[0], RHS: nodes[2]}
 		},
 		p.Term,
 		p.Skip(kind.Multiply),
@@ -81,7 +81,7 @@ func (p *Parser) Div(pos int) (int, ast.AST, error) {
 	return p.Concat(
 		func(nodes []ast.AST) ast.AST {
 			return &ast.BinOp{
-				Type: ast.Div, LHS: nodes[0], RHS: nodes[2]}
+				Kind: ast.Div, LHS: nodes[0], RHS: nodes[2]}
 		},
 		p.Term,
 		p.Skip(kind.Divide),

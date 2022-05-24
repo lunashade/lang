@@ -18,7 +18,7 @@ func TestParseExpr(t *testing.T) {
 		{
 			"1+1",
 			&ast.BinOp{
-				Type: ast.Add,
+				Kind: ast.Add,
 				LHS:  &ast.Int{Value: 1},
 				RHS:  &ast.Int{Value: 1},
 			},
@@ -26,7 +26,7 @@ func TestParseExpr(t *testing.T) {
 		{
 			"1-1",
 			&ast.BinOp{
-				Type: ast.Sub,
+				Kind: ast.Sub,
 				LHS:  &ast.Int{Value: 1},
 				RHS:  &ast.Int{Value: 1},
 			},
@@ -34,7 +34,7 @@ func TestParseExpr(t *testing.T) {
 		{
 			"1*1",
 			&ast.BinOp{
-				Type: ast.Mul,
+				Kind: ast.Mul,
 				LHS:  &ast.Int{Value: 1},
 				RHS:  &ast.Int{Value: 1},
 			},
@@ -42,7 +42,7 @@ func TestParseExpr(t *testing.T) {
 		{
 			"1/1",
 			&ast.BinOp{
-				Type: ast.Div,
+				Kind: ast.Div,
 				LHS:  &ast.Int{Value: 1},
 				RHS:  &ast.Int{Value: 1},
 			},
@@ -50,10 +50,10 @@ func TestParseExpr(t *testing.T) {
 		{
 			"1+1*1",
 			&ast.BinOp{
-				Type: ast.Add,
+				Kind: ast.Add,
 				LHS:  &ast.Int{Value: 1},
 				RHS: &ast.BinOp{
-					Type: ast.Mul,
+					Kind: ast.Mul,
 					LHS:  &ast.Int{Value: 1},
 					RHS:  &ast.Int{Value: 1},
 				},
@@ -62,10 +62,10 @@ func TestParseExpr(t *testing.T) {
 		{
 			"1+1+1",
 			&ast.BinOp{
-				Type: ast.Add,
+				Kind: ast.Add,
 				LHS:  &ast.Int{Value: 1},
 				RHS: &ast.BinOp{
-					Type: ast.Add,
+					Kind: ast.Add,
 					LHS:  &ast.Int{Value: 1},
 					RHS:  &ast.Int{Value: 1},
 				},
@@ -74,10 +74,10 @@ func TestParseExpr(t *testing.T) {
 		{
 			"2*(3+4)",
 			&ast.BinOp{
-				Type: ast.Mul,
+				Kind: ast.Mul,
 				LHS:  &ast.Int{Value: 2},
 				RHS: &ast.BinOp{
-					Type: ast.Add,
+					Kind: ast.Add,
 					LHS:  &ast.Int{Value: 3},
 					RHS:  &ast.Int{Value: 4},
 				},
