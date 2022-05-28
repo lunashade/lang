@@ -43,12 +43,17 @@ func (g *Generator) walk(node ast.AST) error {
 		ty := types.I32
 		fn := g.m.NewFunc(name.Name, ty)
 		g.funcStack.Push(fn)
+
 		blk := g.funcStack.Top().NewBlock("")
 		g.blockStack.Push(blk)
-		body := nd.Body.(ast.Stmt)
-		val, err := g.stmt(body)
-		if err != nil {
-			return err
+		var val value.Value
+		for _, node := range nd.Body {
+			var err error
+			stmt := node.(ast.Stmt)
+			val, err = g.stmt(stmt)
+			if err != nil {
+				return err
+			}
 		}
 		if val != nil {
 			g.blockStack.Top().NewRet(val)

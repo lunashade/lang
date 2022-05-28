@@ -38,20 +38,27 @@ func (p *Parser) Root(pos int) (ast.AST, error) {
 	return &ast.Root{Nodes: []ast.AST{node}}, nil
 }
 
-
 func (p *Parser) Function(pos int) (int, ast.AST, error) {
 	return p.Concat(
 		func(nodes []ast.AST) ast.AST {
+			body := nodes[4].(*ast.Block)
 			return &ast.Function{
 				Name: nodes[0],
-				Body: nodes[4],
+				Body: body.Stmts,
 			}
 		},
 		p.Identifier,
 		p.Skip(kind.LeftParen),
 		p.Skip(kind.RightParen),
 		p.Skip(kind.LeftBrace),
-		p.Stmt,
+		p.Repeat(
+			func(nodes []ast.AST) ast.AST {
+				return &ast.Block{
+					Stmts: nodes,
+				}
+			},
+			p.Stmt,
+		),
 		p.Skip(kind.RightBrace),
 	)(pos)
 }

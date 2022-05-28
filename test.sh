@@ -31,6 +31,8 @@ function main {
     check 8 "main(){ 280 / 20 - 2 * 3 }"
     check 14 "main(){ 2 * (3 + 4) }"
     check 0 "main(){10;}"
+    check 0 "main(){}"
+    check 25 "main(){1; 5*5}"
     echo ok
 }
 

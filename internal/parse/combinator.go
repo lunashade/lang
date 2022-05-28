@@ -39,3 +39,21 @@ func (p *Parser) Concat(m Merger, cands ...NonTerminal) NonTerminal {
 		return nx, m(nodes), nil
 	}
 }
+
+func (p *Parser) Repeat(m Merger, cand NonTerminal) NonTerminal {
+	return func(pos int) (int, ast.AST, error) {
+		var nx int = pos
+		var node ast.AST
+		var err error
+
+		nodes := make([]ast.AST, 0)
+		for {
+			nx, node, err = cand(nx)
+			if err != nil {
+				break
+			}
+			nodes = append(nodes, node)
+		}
+		return nx, m(nodes), nil
+	}
+}
