@@ -1,8 +1,23 @@
 package parse
 
-import "github.com/lunashade/lang/internal/ast"
+import (
+	"errors"
+
+	"github.com/lunashade/lang/internal/ast"
+	"github.com/lunashade/lang/internal/token/kind"
+)
 
 type NonTerminal func(int) (int, ast.AST, error)
+
+func (p *Parser) Skip(kind kind.Kind) NonTerminal {
+	return func(pos int) (int, ast.AST, error) {
+		nx, t := p.consume(kind, pos)
+		if t == nil {
+			return pos, nil, errors.New("invalid token")
+		}
+		return nx, nil, nil
+	}
+}
 
 func (p *Parser) Select(cands ...NonTerminal) NonTerminal {
 	return func(pos int) (int, ast.AST, error) {

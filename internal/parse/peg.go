@@ -177,7 +177,7 @@ func (p *Parser) ParenExpr(pos int) (int, ast.AST, error) {
 }
 
 func (p *Parser) Integer(pos int) (int, ast.AST, error) {
-	nx, t := p.Consume(kind.Integer, pos)
+	nx, t := p.consume(kind.Integer, pos)
 	if t == nil {
 		return pos, nil, errors.New("not an integer token")
 	}
@@ -189,7 +189,7 @@ func (p *Parser) Integer(pos int) (int, ast.AST, error) {
 }
 
 func (p *Parser) Identifier(pos int) (int, ast.AST, error) {
-	nx, t := p.Consume(kind.Identifier, pos)
+	nx, t := p.consume(kind.Identifier, pos)
 	if t == nil {
 		return pos, nil, errors.New("not an identifier token")
 	}
