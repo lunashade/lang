@@ -92,7 +92,7 @@ func TestParseExpr(t *testing.T) {
 			node, _ := Run(ch)
 			root := node.(*ast.Root)
 			fn := root.Nodes[0].(*ast.Function)
-			body := fn.Body.(*ast.ExprStmt)
+			body := fn.Body[0].(*ast.ExprStmt)
 			got := body.Expr
 			assert.DeepEqual(t, tt.want, got)
 		})

@@ -10,11 +10,16 @@ type Root struct {
 
 type Function struct {
 	Name AST
-	Body AST
+	Body []AST
 }
 
-func (Root) node()     {}
-func (Function) node() {}
+type Block struct {
+	Stmts []AST
+}
+
+func (*Root) node()     {}
+func (*Function) node() {}
+func (*Block) node()    {}
 
 // statements
 type Stmt interface {
@@ -28,17 +33,12 @@ type ExprStmt struct {
 type Semi struct {
 	Expr AST
 }
-type Block struct {
-	Stmts []Stmt
-}
 
 func (*ExprStmt) node() {}
 func (*Semi) node()     {}
-func (*Block) node()    {}
 
 func (*ExprStmt) stmtNode() {}
 func (*Semi) stmtNode()     {}
-func (*Block) stmtNode()    {}
 
 // expressions
 type Expr interface {
