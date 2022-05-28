@@ -31,8 +31,7 @@ func (p *Parser) Root(pos int) (ast.AST, error) {
 	if err != nil {
 		return nil, err
 	}
-	p.next()
-	if !p.ateof {
+	if !p.stream.Complete() {
 		return nil, errors.New("not at eof")
 	}
 	return &ast.Root{Nodes: []ast.AST{node}}, nil

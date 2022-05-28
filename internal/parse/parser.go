@@ -9,13 +9,11 @@ import (
 )
 
 type Parser struct {
-	ch     chan token.Token
-	tokens []token.Token
-	ateof  bool
+	stream *token.Stream
 }
 
 func Run(ch chan token.Token) (ast.AST, error) {
-	p := &Parser{ch: ch}
+	p := &Parser{stream: token.NewStream(ch)}
 	node, err := p.Root(0)
 	if err != nil {
 		return nil, err
@@ -23,35 +21,9 @@ func Run(ch chan token.Token) (ast.AST, error) {
 	return node, nil
 }
 
-// next reads next token from channel
-func (p *Parser) next() {
-	if p.ateof {
-		// TODO: return error if needs
-		return
-	}
-	tok := <-p.ch
-	if tok.Kind == kind.Eof {
-		p.ateof = true
-	}
-	p.tokens = append(p.tokens, tok)
-}
-
-// look at the token at the position
-func (p *Parser) look(at int) *token.Token {
-	if at < len(p.tokens) {
-		return &(p.tokens[at])
-	}
-	for !p.ateof {
-		p.next()
-		if at < len(p.tokens) {
-			return &(p.tokens[at])
-		}
-	}
-	return nil
-}
 
 func (p *Parser) Consume(kind kind.Kind, at int) (int, *token.Token) {
-	t := p.look(at)
+	t := p.stream.Look(at)
 	if t == nil || t.Kind != kind {
 		return at, nil
 	}
