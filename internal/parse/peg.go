@@ -40,7 +40,7 @@ func (p *Parser) Root(pos int) (ast.AST, error) {
 func (p *Parser) Function(pos int) (int, ast.AST, error) {
 	return p.Concat(
 		func(nodes []ast.AST) ast.AST {
-			body := nodes[4].(*ast.Block)
+			body := nodes[3].(*ast.Block)
 			return &ast.Function{
 				Name: nodes[0],
 				Body: body.Stmts,
@@ -49,13 +49,23 @@ func (p *Parser) Function(pos int) (int, ast.AST, error) {
 		p.Identifier,
 		p.Skip(kind.LeftParen),
 		p.Skip(kind.RightParen),
+		p.Block,
+	)(pos)
+}
+
+func (p *Parser) Block(pos int) (int, ast.AST, error) {
+	return p.Concat(
+		func(nodes []ast.AST) ast.AST {
+			return nodes[1]
+		},
 		p.Skip(kind.LeftBrace),
-		p.Repeat(
+		p.Repeat2(
 			func(nodes []ast.AST) ast.AST {
 				return &ast.Block{
 					Stmts: nodes,
 				}
 			},
+			p.Select(p.Semi),  // no ExprStmt
 			p.Stmt,
 		),
 		p.Skip(kind.RightBrace),
