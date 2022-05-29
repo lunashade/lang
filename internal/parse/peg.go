@@ -12,11 +12,13 @@ import (
 // Root <- Function*
 // Function <- ident "(" ")" "{" Stmt* "}"
 // === statements ===
-// Stmt <- Semi / ExprStmt
+// Stmt <- Stmt2 / ExprStmt
+// Stmt2 <- Semi
 // [Semi] <- Expr ";"
 // [ExprStmt] <- Expr
 // === expressions ===
 // Expr <- Assign / Sum
+// [Block] <- "{" Stmt2* ExprStmt?  "}"
 // [Assign] <- ident "=" Sum
 // Sum <- Add / Sub / Prod
 // [Add] <- Prod "+" Sum
@@ -59,21 +61,24 @@ func (p *Parser) Block(pos int) (int, ast.AST, error) {
 			return nodes[1]
 		},
 		p.Skip(kind.LeftBrace),
-		p.Repeat2(
+		p.RepeatWithOptionalLast(
 			func(nodes []ast.AST) ast.AST {
 				return &ast.Block{
 					Stmts: nodes,
 				}
 			},
-			p.Select(p.Semi),  // no ExprStmt
-			p.Stmt,
+			p.Stmt2, // no ExprStmt
+			p.ExprStmt,
 		),
 		p.Skip(kind.RightBrace),
 	)(pos)
 }
 
 func (p *Parser) Stmt(pos int) (int, ast.AST, error) {
-	return p.Select(p.Semi, p.ExprStmt)(pos)
+	return p.Select(p.Stmt2, p.ExprStmt)(pos)
+}
+func (p *Parser) Stmt2(pos int) (int, ast.AST, error) {
+	return p.Select(p.Semi)(pos)
 }
 
 func (p *Parser) ExprStmt(pos int) (int, ast.AST, error) {
