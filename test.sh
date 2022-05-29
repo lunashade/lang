@@ -33,6 +33,7 @@ function main {
     check 0 "main(){10;}"
     check 0 "main(){}"
     check 25 "main(){1; 5*5}"
+    check 25 "main(){1+1; 5*5}"
     echo ok
 }
 

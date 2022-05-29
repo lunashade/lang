@@ -12,11 +12,13 @@ import (
 // Root <- Function*
 // Function <- ident "(" ")" "{" Stmt* "}"
 // === statements ===
-// Stmt <- Semi / ExprStmt
+// Stmt <- Stmt2 / ExprStmt
+// Stmt2 <- Semi
 // [Semi] <- Expr ";"
 // [ExprStmt] <- Expr
 // === expressions ===
 // Expr <- Assign / Sum
+// [Block] <- "{" Stmt2* ExprStmt?  "}"
 // [Assign] <- ident "=" Sum
 // Sum <- Add / Sub / Prod
 // [Add] <- Prod "+" Sum
@@ -40,7 +42,7 @@ func (p *Parser) Root(pos int) (ast.AST, error) {
 func (p *Parser) Function(pos int) (int, ast.AST, error) {
 	return p.Concat(
 		func(nodes []ast.AST) ast.AST {
-			body := nodes[4].(*ast.Block)
+			body := nodes[3].(*ast.Block)
 			return &ast.Function{
 				Name: nodes[0],
 				Body: body.Stmts,
@@ -49,21 +51,34 @@ func (p *Parser) Function(pos int) (int, ast.AST, error) {
 		p.Identifier,
 		p.Skip(kind.LeftParen),
 		p.Skip(kind.RightParen),
+		p.Block,
+	)(pos)
+}
+
+func (p *Parser) Block(pos int) (int, ast.AST, error) {
+	return p.Concat(
+		func(nodes []ast.AST) ast.AST {
+			return nodes[1]
+		},
 		p.Skip(kind.LeftBrace),
-		p.Repeat(
+		p.RepeatWithOptionalLast(
 			func(nodes []ast.AST) ast.AST {
 				return &ast.Block{
 					Stmts: nodes,
 				}
 			},
-			p.Stmt,
+			p.Stmt2, // no ExprStmt
+			p.ExprStmt,
 		),
 		p.Skip(kind.RightBrace),
 	)(pos)
 }
 
 func (p *Parser) Stmt(pos int) (int, ast.AST, error) {
-	return p.Select(p.Semi, p.ExprStmt)(pos)
+	return p.Select(p.Stmt2, p.ExprStmt)(pos)
+}
+func (p *Parser) Stmt2(pos int) (int, ast.AST, error) {
+	return p.Select(p.Semi)(pos)
 }
 
 func (p *Parser) ExprStmt(pos int) (int, ast.AST, error) {

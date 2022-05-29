@@ -97,5 +97,43 @@ func TestParseExpr(t *testing.T) {
 			assert.DeepEqual(t, tt.want, got)
 		})
 	}
+}
+
+func TestParseFunc(t *testing.T) {
+	tests := []struct {
+		input string
+		want  ast.AST
+	}{
+		{
+			"main(){1; 5*5}",
+			&ast.Function{
+				Name: &ast.Ident{
+					Name: "main",
+				},
+				Body: []ast.AST{
+					&ast.Semi{
+						Expr: &ast.Int{Value: 1},
+					},
+					&ast.ExprStmt{
+						Expr: &ast.BinOp{
+							Kind: ast.Mul,
+							LHS:  &ast.Int{Value: 5},
+							RHS:  &ast.Int{Value: 5},
+						},
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.input, func(t *testing.T) {
+			input := fmt.Sprintf("%s", tt.input)
+			ch := token.Lex(strings.NewReader(input))
+			node, _ := Run(ch)
+			root := node.(*ast.Root)
+			got := root.Nodes[0].(*ast.Function)
+			assert.DeepEqual(t, tt.want, got)
+		})
+	}
 
 }
