@@ -8,10 +8,14 @@ import (
 
 type Parser struct {
 	stream *token.Stream
+	cache  Cache
 }
 
 func Run(ch chan token.Token) (ast.AST, error) {
-	p := &Parser{stream: token.NewStream(ch)}
+	p := &Parser{
+		stream: token.NewStream(ch),
+		cache:  make(Cache),
+	}
 	node, err := p.Root(0)
 	if err != nil {
 		return nil, err
