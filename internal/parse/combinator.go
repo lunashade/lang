@@ -55,7 +55,7 @@ func (p *Parser) Concat(m Merger, cands ...NonTerminal) NonTerminal {
 	}
 }
 
-// Repeat2 is parser combinator of "cand*"
+// Repeat is parser combinator of "cand*"
 func (p *Parser) Repeat(m Merger, cand NonTerminal) NonTerminal {
 	return func(pos int) (int, ast.AST, error) {
 		var nx int = pos

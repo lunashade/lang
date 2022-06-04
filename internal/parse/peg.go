@@ -10,7 +10,7 @@ import (
 
 // PEG
 // Root <- Function*
-// Function <- ident "(" ")" "{" Stmt* "}"
+// Function <- ident "(" ")" Block
 // === statements ===
 // Stmt <- Stmt2 / ExprStmt
 // Stmt2 <- Semi
@@ -23,22 +23,32 @@ import (
 // Sum <- Add / Sub / Prod
 // [Add] <- Prod "+" Sum
 // [Sub] <- Prod "-" Sum
-// Prod <- Mul / Div / Term
-// [Mul] <- Term "*" Prod
-// [Div] <- Term "/" Prod
-// Term <- ParenExpr / int / ident
+// Prod <- Mul / Div / Primary
+// [Mul] <- Primary "*" Prod
+// [Div] <- Primary "/" Prod
+// Primary <- Block / ParenExpr / int / ident
 // [ParenExpr] <- "(" Expr ")"
+
+// Root parses root node
+// PEG: Root <- Function*
 func (p *Parser) Root(pos int) (ast.AST, error) {
-	_, node, err := p.Function(0)
+	_, node, err := p.Repeat(
+		func(nodes []ast.AST) ast.AST {
+			return &ast.Root{Nodes: nodes}
+		},
+		p.Select(p.Function),
+	)(0)
 	if err != nil {
 		return nil, err
 	}
 	if !p.stream.Complete() {
 		return nil, errors.New("not at eof")
 	}
-	return &ast.Root{Nodes: []ast.AST{node}}, nil
+	return node, nil
 }
 
+// Function parses function node
+// PEG: Function <- ident "(" ")" Block
 func (p *Parser) Function(pos int) (int, ast.AST, error) {
 	return p.Concat(
 		func(nodes []ast.AST) ast.AST {
