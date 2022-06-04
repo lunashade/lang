@@ -20,6 +20,8 @@ import (
 // Expr <- Assign / Sum
 // [Block] <- "{" Stmt2* ExprStmt?  "}"
 // [Assign] <- ident "=" Sum
+// Cond <- Sum RelOp Cond
+// [RelOp] <- "==" / "!=" / "<=" / ">=" / "<" / ">"
 // Sum <- Add / Sub / Prod
 // [Add] <- Prod "+" Sum
 // [Sub] <- Prod "-" Sum
