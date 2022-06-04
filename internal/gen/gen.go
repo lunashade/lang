@@ -86,6 +86,17 @@ func (g *Generator) expr(node ast.Expr) (value.Value, error) {
 		return constant.NewInt(types.I32, nd.Value), nil
 	case *ast.BinOp:
 		return g.binOp(nd)
+	case *ast.Block:
+		var val value.Value
+		var err error
+		for _, n := range nd.Stmts {
+			stmt := n.(ast.Stmt)
+			val, err = g.stmt(stmt)
+			if err != nil {
+				return nil, err
+			}
+		}
+		return val, nil
 	default:
 		return nil, errors.New("unknown expr")
 	}

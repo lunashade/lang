@@ -135,7 +135,7 @@ func (p *Parser) Sum(pos int) (int, ast.AST, error) {
 	return p.Select(p.Add, p.Sub, p.Prod)(pos)
 }
 func (p *Parser) Prod(pos int) (int, ast.AST, error) {
-	return p.Select(p.Mul, p.Div, p.Term)(pos)
+	return p.Select(p.Mul, p.Div, p.Primary)(pos)
 }
 
 func (p *Parser) Add(pos int) (int, ast.AST, error) {
@@ -168,7 +168,7 @@ func (p *Parser) Mul(pos int) (int, ast.AST, error) {
 			return &ast.BinOp{
 				Kind: ast.Mul, LHS: nodes[0], RHS: nodes[2]}
 		},
-		p.Term,
+		p.Primary,
 		p.Skip(kind.Multiply),
 		p.Prod,
 	)(pos)
@@ -180,14 +180,14 @@ func (p *Parser) Div(pos int) (int, ast.AST, error) {
 			return &ast.BinOp{
 				Kind: ast.Div, LHS: nodes[0], RHS: nodes[2]}
 		},
-		p.Term,
+		p.Primary,
 		p.Skip(kind.Divide),
 		p.Prod,
 	)(pos)
 }
 
-func (p *Parser) Term(pos int) (int, ast.AST, error) {
-	return p.Select(p.ParenExpr, p.Integer)(pos)
+func (p *Parser) Primary(pos int) (int, ast.AST, error) {
+	return p.Select(p.Block, p.ParenExpr, p.Integer)(pos)
 }
 
 func (p *Parser) ParenExpr(pos int) (int, ast.AST, error) {

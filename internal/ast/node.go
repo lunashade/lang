@@ -75,3 +75,4 @@ func (*BinOp) node() {}
 func (*Int) exprNode()   {}
 func (*Ident) exprNode() {}
 func (*BinOp) exprNode() {}
+func (*Block) exprNode() {}

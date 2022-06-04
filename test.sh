@@ -34,6 +34,8 @@ function main {
     check 0 "main(){}"
     check 25 "main(){1+1; 5*5}"
     check 0 "main(){1+1; 5*5;}"
+    check 25 "main(){3; {2; 25}}"
+    check 14 "main(){3; {2; 25}; 14}"
     echo ok
 }
 
