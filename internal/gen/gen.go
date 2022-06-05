@@ -6,6 +6,7 @@ import (
 
 	"github.com/llir/llvm/ir"
 	"github.com/llir/llvm/ir/constant"
+	"github.com/llir/llvm/ir/enum"
 	"github.com/llir/llvm/ir/types"
 	"github.com/llir/llvm/ir/value"
 	"github.com/lunashade/lang/internal/ast"
@@ -128,6 +129,30 @@ func (g *Generator) binOp(node *ast.BinOp) (value.Value, error) {
 		return res, nil
 	case ast.Div:
 		res := g.blockStack.Top().NewSDiv(lhs, rhs)
+		return res, nil
+	case ast.Equal:
+		b := g.blockStack.Top().NewICmp(enum.IPredEQ, lhs, rhs)
+		res := g.blockStack.Top().NewZExt(b, types.I32)
+		return res, nil
+	case ast.NotEqual:
+		b := g.blockStack.Top().NewICmp(enum.IPredNE, lhs, rhs)
+		res := g.blockStack.Top().NewZExt(b, types.I32)
+		return res, nil
+	case ast.LessThan:
+		b := g.blockStack.Top().NewICmp(enum.IPredSLT, lhs, rhs)
+		res := g.blockStack.Top().NewZExt(b, types.I32)
+		return res, nil
+	case ast.GreaterThan:
+		b := g.blockStack.Top().NewICmp(enum.IPredSGT, lhs, rhs)
+		res := g.blockStack.Top().NewZExt(b, types.I32)
+		return res, nil
+	case ast.LessThanOrEqual:
+		b := g.blockStack.Top().NewICmp(enum.IPredSLE, lhs, rhs)
+		res := g.blockStack.Top().NewZExt(b, types.I32)
+		return res, nil
+	case ast.GreaterThanOrEqual:
+		b := g.blockStack.Top().NewICmp(enum.IPredSGE, lhs, rhs)
+		res := g.blockStack.Top().NewZExt(b, types.I32)
 		return res, nil
 	}
 	return nil, errors.New("unknown operator")

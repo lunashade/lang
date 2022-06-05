@@ -84,6 +84,38 @@ func TestParseExpr(t *testing.T) {
 				},
 			},
 		},
+		{
+			"1<=1",
+			&ast.BinOp{
+				Kind: ast.LessThanOrEqual,
+				LHS:  &ast.Int{Value: 1},
+				RHS:  &ast.Int{Value: 1},
+			},
+		},
+		{
+			"1>=1",
+			&ast.BinOp{
+				Kind: ast.GreaterThanOrEqual,
+				LHS:  &ast.Int{Value: 1},
+				RHS:  &ast.Int{Value: 1},
+			},
+		},
+		{
+			"1<1",
+			&ast.BinOp{
+				Kind: ast.LessThan,
+				LHS:  &ast.Int{Value: 1},
+				RHS:  &ast.Int{Value: 1},
+			},
+		},
+		{
+			"1>1",
+			&ast.BinOp{
+				Kind: ast.GreaterThan,
+				LHS:  &ast.Int{Value: 1},
+				RHS:  &ast.Int{Value: 1},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {

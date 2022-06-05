@@ -17,11 +17,12 @@ import (
 // [Semi] <- Expr ";"
 // [ExprStmt] <- Expr
 // === expressions ===
-// Expr <- Assign / Sum
+// Expr <- Assign / Cond
 // [Block] <- "{" Stmt2* ExprStmt?  "}"
-// [Assign] <- ident "=" Sum
-// Cond <- Sum RelOp Cond
-// [RelOp] <- "==" / "!=" / "<=" / ">=" / "<" / ">"
+// [Assign] <- ident "=" Cond
+// Cond <- Eq / Neq / Lteq / Gteq / Lt / Gt / Sum
+// [Eq] <- Sum "==" Cond
+// [Neq] <- Sum "!=" Cond
 // Sum <- Add / Sub / Prod
 // [Add] <- Prod "+" Sum
 // [Sub] <- Prod "-" Sum
@@ -117,7 +118,7 @@ func (p *Parser) Semi(pos int) (int, ast.AST, error) {
 }
 
 func (p *Parser) Expr(pos int) (int, ast.AST, error) {
-	return p.Select(p.Assign, p.Sum)(pos)
+	return p.Select(p.Assign, p.Cond)(pos)
 }
 
 func (p *Parser) Assign(pos int) (int, ast.AST, error) {
@@ -129,7 +130,113 @@ func (p *Parser) Assign(pos int) (int, ast.AST, error) {
 		},
 		p.Identifier,
 		p.Skip(kind.Assign),
+		p.Cond,
+	)(pos)
+}
+
+func (p *Parser) Cond(pos int) (int, ast.AST, error) {
+	return p.Select(
+		p.Eq,
+		p.Neq,
+		p.Lteq,
+		p.Gteq,
+		p.Lt,
+		p.Gt,
 		p.Sum,
+	)(pos)
+}
+
+func (p *Parser) Eq(pos int) (int, ast.AST, error) {
+	return p.Concat(
+		func(nodes []ast.AST) ast.AST {
+			return &ast.BinOp{
+				Kind: ast.Equal,
+				LHS:  nodes[0],
+				RHS:  nodes[3],
+			}
+		},
+		p.Sum,
+		p.Skip(kind.Assign),
+		p.Skip(kind.Assign),
+		p.Cond,
+	)(pos)
+}
+
+func (p *Parser) Neq(pos int) (int, ast.AST, error) {
+	return p.Concat(
+		func(nodes []ast.AST) ast.AST {
+			return &ast.BinOp{
+				Kind: ast.NotEqual,
+				LHS:  nodes[0],
+				RHS:  nodes[3],
+			}
+		},
+		p.Sum,
+		p.Skip(kind.Not),
+		p.Skip(kind.Assign),
+		p.Cond,
+	)(pos)
+}
+
+func (p *Parser) Lteq(pos int) (int, ast.AST, error) {
+	return p.Concat(
+		func(nodes []ast.AST) ast.AST {
+			return &ast.BinOp{
+				Kind: ast.LessThanOrEqual,
+				LHS:  nodes[0],
+				RHS:  nodes[3],
+			}
+		},
+		p.Sum,
+		p.Skip(kind.LessThan),
+		p.Skip(kind.Assign),
+		p.Cond,
+	)(pos)
+}
+
+func (p *Parser) Gteq(pos int) (int, ast.AST, error) {
+	return p.Concat(
+		func(nodes []ast.AST) ast.AST {
+			return &ast.BinOp{
+				Kind: ast.GreaterThanOrEqual,
+				LHS:  nodes[0],
+				RHS:  nodes[3],
+			}
+		},
+		p.Sum,
+		p.Skip(kind.GreaterThan),
+		p.Skip(kind.Assign),
+		p.Cond,
+	)(pos)
+}
+
+func (p *Parser) Lt(pos int) (int, ast.AST, error) {
+	return p.Concat(
+		func(nodes []ast.AST) ast.AST {
+			return &ast.BinOp{
+				Kind: ast.LessThan,
+				LHS:  nodes[0],
+				RHS:  nodes[2],
+			}
+		},
+		p.Sum,
+		p.Skip(kind.LessThan),
+		p.Cond,
+	)(pos)
+}
+
+func (p *Parser) Gt(pos int) (int, ast.AST, error) {
+	return p.Concat(
+		func(nodes []ast.AST) ast.AST {
+			return &ast.BinOp{
+				Kind: ast.GreaterThan,
+				LHS:  nodes[0],
+				RHS:  nodes[2],
+			}
+		},
+		p.Sum,
+		p.Skip(kind.GreaterThan),
+		p.Cond,
 	)(pos)
 }
 

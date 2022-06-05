@@ -39,13 +39,21 @@ func TestLex(t *testing.T) {
 		},
 		// punct
 		{
-			"symbol", "+-*/+",
+			"symbol", "+-*/=(){}<>;!",
 			[]Token{
 				{Kind: kind.Plus, Sval: "+"},
 				{Kind: kind.Minus, Sval: "-"},
 				{Kind: kind.Multiply, Sval: "*"},
 				{Kind: kind.Divide, Sval: "/"},
-				{Kind: kind.Plus, Sval: "+"},
+				{Kind: kind.Assign, Sval: "="},
+				{Kind: kind.LeftParen, Sval: "("},
+				{Kind: kind.RightParen, Sval: ")"},
+				{Kind: kind.LeftBrace, Sval: "{"},
+				{Kind: kind.RightBrace, Sval: "}"},
+				{Kind: kind.LessThan, Sval: "<"},
+				{Kind: kind.GreaterThan, Sval: ">"},
+				{Kind: kind.Semicolon, Sval: ";"},
+				{Kind: kind.Not, Sval: "!"},
 				{Kind: kind.Eof, Sval: ""},
 			},
 		},

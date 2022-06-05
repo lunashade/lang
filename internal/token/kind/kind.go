@@ -24,9 +24,10 @@ const (
 	LessThan    // '<'
 	GreaterThan // '>'
 	Semicolon   // ';'
+	Not         // '!'
 )
 
-const Symbols = "+-*/=(){}<>;"
+const Symbols = "+-*/=(){}<>;!"
 
 func SymbolKind(c rune) Kind {
 	for i, r := range Symbols {

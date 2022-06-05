@@ -66,6 +66,12 @@ const (
 	Mul
 	Div
 	Assign
+	Equal
+	NotEqual
+	LessThan
+	GreaterThan
+	LessThanOrEqual
+	GreaterThanOrEqual
 )
 
 func (*Int) node()   {}
