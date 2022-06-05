@@ -103,6 +103,16 @@ func TestLex(t *testing.T) {
 				{Kind: kind.Eof, Sval: ""},
 			},
 		},
+		{
+			"keywords", "if then else ifs",
+			[]Token{
+				{Kind: kind.KwIf, Sval: "if"},
+				{Kind: kind.KwThen, Sval: "then"},
+				{Kind: kind.KwElse, Sval: "else"},
+				{Kind: kind.Identifier, Sval: "ifs"},
+				{Kind: kind.Eof, Sval: ""},
+			},
+		},
 	}
 
 	for _, tt := range tests {

@@ -7,7 +7,10 @@ const (
 	Invalid Kind = iota
 	Eof
 	Identifier
-	Keyword
+	// Keywords
+	KwIf   // "if"
+	KwThen // "then"
+	KwElse // "else"
 	// Literal
 	Integer
 	String
@@ -36,4 +39,17 @@ func SymbolKind(c rune) Kind {
 		}
 	}
 	return Invalid
+}
+
+var Keywords = []string{
+	"if", "then", "else",
+}
+
+func KeywordKind(s string) Kind {
+	for i, kw := range Keywords {
+		if kw == s {
+			return Kind(i + int(KwIf))
+		}
+	}
+	return Identifier
 }

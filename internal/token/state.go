@@ -45,7 +45,9 @@ func lexIdent(l *lexer) stateFn {
 		l.buf = append(l.buf, c)
 	}
 	l.backup()
-	l.emit(kind.Identifier)
+
+	k := kind.KeywordKind(string(l.buf))
+	l.emit(k)
 	return lexSkip
 }
 
