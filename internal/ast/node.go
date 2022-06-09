@@ -17,9 +17,10 @@ type Block struct {
 	Stmts []AST
 }
 
-func (*Root) node()     {}
-func (*Function) node() {}
-func (*Block) node()    {}
+func (*Root) node()      {}
+func (*Function) node()  {}
+func (*Block) node()     {}
+func (*Block) exprNode() {}
 
 // statements
 type Stmt interface {
@@ -60,6 +61,12 @@ type BinOp struct {
 }
 type BinOpKind int
 
+type IfExpr struct {
+	Cond AST
+	Then AST
+	Els  AST
+}
+
 const (
 	Add BinOpKind = iota + 1
 	Sub
@@ -74,11 +81,12 @@ const (
 	GreaterThanOrEqual
 )
 
-func (*Int) node()   {}
-func (*Ident) node() {}
-func (*BinOp) node() {}
+func (*Int) node()    {}
+func (*Ident) node()  {}
+func (*BinOp) node()  {}
+func (*IfExpr) node() {}
 
-func (*Int) exprNode()   {}
-func (*Ident) exprNode() {}
-func (*BinOp) exprNode() {}
-func (*Block) exprNode() {}
+func (*Int) exprNode()    {}
+func (*Ident) exprNode()  {}
+func (*BinOp) exprNode()  {}
+func (*IfExpr) exprNode() {}

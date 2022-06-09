@@ -116,6 +116,18 @@ func TestParseExpr(t *testing.T) {
 				RHS:  &ast.Int{Value: 1},
 			},
 		},
+		{
+			"if 1==1 then 25 else 30",
+			&ast.IfExpr{
+				Cond: &ast.BinOp{
+					Kind: ast.Equal,
+					LHS:  &ast.Int{Value: 1},
+					RHS:  &ast.Int{Value: 1},
+				},
+				Then: &ast.Int{Value: 25},
+				Els:  &ast.Int{Value: 30},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {

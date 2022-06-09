@@ -8,18 +8,19 @@ import (
 	"github.com/lunashade/lang/internal/token/kind"
 )
 
-// PEG
+// === PEG ===
 // Root <- Function*
 // Function <- ident "(" ")" Block
-// === statements ===
+// --- statements ---
 // Stmt <- Stmt2 / ExprStmt
 // Stmt2 <- Semi
 // [Semi] <- Expr ";"
 // [ExprStmt] <- Expr
-// === expressions ===
-// Expr <- Assign / Cond
-// [Block] <- "{" Stmt2* ExprStmt?  "}"
-// [Assign] <- ident "=" Cond
+// --- expressions ---
+// Expr <- Assign / Expr2
+// [Assign] <- ident "=" Expr2
+// Expr2 <- If / Cond
+// [If] <- "if" Expr "then" Expr ("else" Expr)?
 // Cond <- Eq / Neq / Lteq / Gteq / Lt / Gt / Sum
 // [Eq] <- Sum "==" Cond
 // [Neq] <- Sum "!=" Cond
@@ -31,6 +32,7 @@ import (
 // [Div] <- Primary "/" Prod
 // Primary <- Block / ParenExpr / int / ident
 // [ParenExpr] <- "(" Expr ")"
+// [Block] <- "{" Stmt2* ExprStmt?  "}"
 
 // Root parses root node
 // PEG: Root <- Function*
@@ -118,7 +120,7 @@ func (p *Parser) Semi(pos int) (int, ast.AST, error) {
 }
 
 func (p *Parser) Expr(pos int) (int, ast.AST, error) {
-	return p.Select(p.Assign, p.Cond)(pos)
+	return p.Select(p.Assign, p.Expr2)(pos)
 }
 
 func (p *Parser) Assign(pos int) (int, ast.AST, error) {
@@ -130,7 +132,27 @@ func (p *Parser) Assign(pos int) (int, ast.AST, error) {
 		},
 		p.Identifier,
 		p.Skip(kind.Assign),
-		p.Cond,
+		p.Expr2,
+	)(pos)
+}
+
+func (p *Parser) Expr2(pos int) (int, ast.AST, error) {
+	return p.Select(p.If, p.Cond)(pos)
+}
+
+func (p *Parser) If(pos int) (int, ast.AST, error) {
+	snd := func(nodes []ast.AST) ast.AST { return nodes[1] }
+	return p.Concat(
+		func(nodes []ast.AST) ast.AST {
+			return &ast.IfExpr{
+				Cond: nodes[0],
+				Then: nodes[1],
+				Els:  nodes[2],
+			}
+		},
+		p.Concat(snd, p.Skip(kind.KwIf), p.Expr),
+		p.Concat(snd, p.Skip(kind.KwThen), p.Expr),
+		p.Optional(p.Concat(snd, p.Skip(kind.KwElse), p.Expr)),
 	)(pos)
 }
 
