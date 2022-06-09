@@ -100,8 +100,6 @@ func (g *Generator) expr(node ast.Expr) (value.Value, error) {
 		return val, nil
 	case *ast.IfExpr:
 		cond := nd.Cond.(ast.Expr)
-		then := nd.Then.(ast.Expr)
-		els := nd.Els.(ast.Expr)
 
 		// gen cond node
 		condV, err := g.expr(cond)
@@ -120,6 +118,7 @@ func (g *Generator) expr(node ast.Expr) (value.Value, error) {
 
 		// gen then node
 		g.blockStack.Push(thenBlock)
+		then := nd.Then.(ast.Expr)
 		thenV, err := g.expr(then)
 		if err != nil {
 			return nil, err
@@ -127,16 +126,18 @@ func (g *Generator) expr(node ast.Expr) (value.Value, error) {
 		if br := g.blockStack.Pop(); br != thenBlock {
 			return nil, errors.New("different block popped")
 		}
+		thenBlock.NewBr(mergeBlock)
 
 		// gen else node
 		g.blockStack.Push(elsBlock)
-
 		var elsV value.Value
-		if els == nil {
-			// use 0 instead
+
+		if nd.Els == nil {
+			// if else is nil, then use 0-value instead
 			elsV = constant.NewInt(types.I32, 0)
 		} else {
 			var err error
+			els := nd.Els.(ast.Expr)
 			elsV, err = g.expr(els)
 			if err != nil {
 				return nil, err
@@ -145,6 +146,7 @@ func (g *Generator) expr(node ast.Expr) (value.Value, error) {
 		if br := g.blockStack.Pop(); br != elsBlock {
 			return nil, errors.New("different block popped")
 		}
+		elsBlock.NewBr(mergeBlock)
 
 		// gen merge block
 		g.blockStack.Push(mergeBlock)
