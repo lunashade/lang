@@ -74,7 +74,7 @@ func (p *Parser) Concat(m Merger, cands ...NonTerminal) NonTerminal {
 
 		nodes := make([]ast.AST, 0)
 		for _, cand := range cands {
-			nx, node, err = p.CachedCall(cand, nx)
+			nx, node, err = cand(nx)
 			if err != nil {
 				return pos, nil, err
 			}
