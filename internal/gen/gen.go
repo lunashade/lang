@@ -2,10 +2,12 @@ package gen
 
 import (
 	"errors"
+	"fmt"
 	"io"
 
 	"github.com/llir/llvm/ir"
 	"github.com/llir/llvm/ir/constant"
+	"github.com/llir/llvm/ir/enum"
 	"github.com/llir/llvm/ir/types"
 	"github.com/llir/llvm/ir/value"
 	"github.com/lunashade/lang/internal/ast"
@@ -15,6 +17,7 @@ type Generator struct {
 	m          *ir.Module
 	funcStack  Stack[ir.Func]
 	blockStack Stack[ir.Block]
+	blockCount int // counter for block id.
 }
 
 func Run(w io.Writer, tree ast.AST) error {
@@ -45,6 +48,7 @@ func (g *Generator) walk(node ast.AST) error {
 		g.funcStack.Push(fn)
 
 		blk := g.funcStack.Top().NewBlock("")
+		g.blockCount = 0
 		g.blockStack.Push(blk)
 		var val value.Value
 		for _, node := range nd.Body {
@@ -97,6 +101,58 @@ func (g *Generator) expr(node ast.Expr) (value.Value, error) {
 			}
 		}
 		return val, nil
+	case *ast.IfExpr:
+		g.blockCount++
+		count := g.blockCount
+		cond := nd.Cond.(ast.Expr)
+
+		// gen cond node
+		condV, err := g.expr(cond)
+		if err != nil {
+			return nil, err
+		}
+		topBlock := g.blockStack.Pop()
+		// condV != 0 -> cast to bool
+		condV = topBlock.NewICmp(enum.IPredNE, condV, constant.NewInt(types.I32, 0))
+
+		// branch
+		thenBlock := topBlock.Parent.NewBlock(fmt.Sprintf("then%d", count))
+		elsBlock := topBlock.Parent.NewBlock(fmt.Sprintf("els%d", count))
+		mergeBlock := topBlock.Parent.NewBlock(fmt.Sprintf("ifcont%d", count))
+		topBlock.NewCondBr(condV, thenBlock, elsBlock)
+
+		// gen then node
+		g.blockStack.Push(thenBlock)
+		then := nd.Then.(ast.Expr)
+		thenV, err := g.expr(then)
+		if err != nil {
+			return nil, err
+		}
+		thenBlock = g.blockStack.Pop()
+		thenBlock.NewBr(mergeBlock)
+
+		// gen else node
+		g.blockStack.Push(elsBlock)
+		var elsV value.Value
+
+		if nd.Els == nil {
+			// if else is nil, then use 0-value instead
+			elsV = constant.NewInt(types.I32, 0)
+		} else {
+			var err error
+			els := nd.Els.(ast.Expr)
+			elsV, err = g.expr(els)
+			if err != nil {
+				return nil, err
+			}
+		}
+		elsBlock = g.blockStack.Pop()
+		elsBlock.NewBr(mergeBlock)
+
+		// gen merge block
+		g.blockStack.Push(mergeBlock)
+		phi := mergeBlock.NewPhi(ir.NewIncoming(thenV, thenBlock), ir.NewIncoming(elsV, elsBlock))
+		return phi, nil
 	default:
 		return nil, errors.New("unknown expr")
 	}
@@ -128,6 +184,30 @@ func (g *Generator) binOp(node *ast.BinOp) (value.Value, error) {
 		return res, nil
 	case ast.Div:
 		res := g.blockStack.Top().NewSDiv(lhs, rhs)
+		return res, nil
+	case ast.Equal:
+		b := g.blockStack.Top().NewICmp(enum.IPredEQ, lhs, rhs)
+		res := g.blockStack.Top().NewZExt(b, types.I32)
+		return res, nil
+	case ast.NotEqual:
+		b := g.blockStack.Top().NewICmp(enum.IPredNE, lhs, rhs)
+		res := g.blockStack.Top().NewZExt(b, types.I32)
+		return res, nil
+	case ast.LessThan:
+		b := g.blockStack.Top().NewICmp(enum.IPredSLT, lhs, rhs)
+		res := g.blockStack.Top().NewZExt(b, types.I32)
+		return res, nil
+	case ast.GreaterThan:
+		b := g.blockStack.Top().NewICmp(enum.IPredSGT, lhs, rhs)
+		res := g.blockStack.Top().NewZExt(b, types.I32)
+		return res, nil
+	case ast.LessThanOrEqual:
+		b := g.blockStack.Top().NewICmp(enum.IPredSLE, lhs, rhs)
+		res := g.blockStack.Top().NewZExt(b, types.I32)
+		return res, nil
+	case ast.GreaterThanOrEqual:
+		b := g.blockStack.Top().NewICmp(enum.IPredSGE, lhs, rhs)
+		res := g.blockStack.Top().NewZExt(b, types.I32)
 		return res, nil
 	}
 	return nil, errors.New("unknown operator")

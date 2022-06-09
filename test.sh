@@ -36,6 +36,23 @@ function main {
     check 0 "main(){1+1; 5*5;}"
     check 25 "main(){3; {2; 25}}"
     check 14 "main(){3; {2; 25}; 14}"
+    check 1 "main(){ 1==1 }"
+    check 0 "main(){ 0==1 }"
+    check 0 "main(){ 1!=1 }"
+    check 1 "main(){ 0!=1 }"
+    check 1 "main(){ 1<=1 }"
+    check 1 "main(){ 0<=1 }"
+    check 1 "main(){ 1>=1 }"
+    check 0 "main(){ 0>=1 }"
+    check 0 "main(){ 1<1 }"
+    check 1 "main(){ 0<1 }"
+    check 0 "main(){ 1>1 }"
+    check 0 "main(){ 0>1 }"
+    check 25 "main(){ if 1==1 then 5*5 }"
+    check 25 "main(){ if 1==1 then 5*5 else 5*5-5 }"
+    check 20 "main(){ if 1==0 then 5*5 else 5*5-5 }"
+    check 0 "main(){ if 1==0 then 5*5 }"
+    check 25 "main() {if {if 1 then 1 else 0} then {if 1 then 25 else 0} else {if 1 then 0 else 0}}"
     echo ok
 }
 
