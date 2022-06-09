@@ -64,6 +64,16 @@ func (p *Parser) Select(cands ...NonTerminal) NonTerminal {
 	}
 }
 
+func (p *Parser) Optional(cand NonTerminal) NonTerminal {
+	return func(pos int) (int, ast.AST, error) {
+		nx, node, err := cand(pos)
+		if err != nil {
+			return pos, nil, nil
+		}
+		return nx, node, nil
+	}
+}
+
 type Merger func([]ast.AST) ast.AST
 
 func (p *Parser) Concat(m Merger, cands ...NonTerminal) NonTerminal {
