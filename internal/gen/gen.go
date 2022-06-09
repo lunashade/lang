@@ -98,6 +98,58 @@ func (g *Generator) expr(node ast.Expr) (value.Value, error) {
 			}
 		}
 		return val, nil
+	case *ast.IfExpr:
+		cond := nd.Cond.(ast.Expr)
+		then := nd.Then.(ast.Expr)
+		els := nd.Els.(ast.Expr)
+
+		// gen cond node
+		condV, err := g.expr(cond)
+		if err != nil {
+			return nil, err
+		}
+		topBlock := g.blockStack.Pop()
+		// condV != 0 -> cast to bool
+		condV = topBlock.NewICmp(enum.IPredNE, condV, constant.NewInt(types.I32, 0))
+
+		// branch
+		thenBlock := topBlock.Parent.NewBlock("then")
+		elsBlock := topBlock.Parent.NewBlock("els")
+		mergeBlock := topBlock.Parent.NewBlock("ifcont")
+		topBlock.NewCondBr(condV, thenBlock, elsBlock)
+
+		// gen then node
+		g.blockStack.Push(thenBlock)
+		thenV, err := g.expr(then)
+		if err != nil {
+			return nil, err
+		}
+		if br := g.blockStack.Pop(); br != thenBlock {
+			return nil, errors.New("different block popped")
+		}
+
+		// gen else node
+		g.blockStack.Push(elsBlock)
+
+		var elsV value.Value
+		if els == nil {
+			// use 0 instead
+			elsV = constant.NewInt(types.I32, 0)
+		} else {
+			var err error
+			elsV, err = g.expr(els)
+			if err != nil {
+				return nil, err
+			}
+		}
+		if br := g.blockStack.Pop(); br != elsBlock {
+			return nil, errors.New("different block popped")
+		}
+
+		// gen merge block
+		g.blockStack.Push(mergeBlock)
+		phi := mergeBlock.NewPhi(ir.NewIncoming(thenV, thenBlock), ir.NewIncoming(elsV, elsBlock))
+		return phi, nil
 	default:
 		return nil, errors.New("unknown expr")
 	}
