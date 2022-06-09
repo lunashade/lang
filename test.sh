@@ -52,6 +52,7 @@ function main {
     check 25 "main(){ if 1==1 then 5*5 else 5*5-5 }"
     check 20 "main(){ if 1==0 then 5*5 else 5*5-5 }"
     check 0 "main(){ if 1==0 then 5*5 }"
+    check 25 "main() {if {if 1 then 1 else 0} then {if 1 then 25 else 0} else {if 1 then 0 else 0}}"
     echo ok
 }
 

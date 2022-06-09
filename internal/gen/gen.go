@@ -2,6 +2,7 @@ package gen
 
 import (
 	"errors"
+	"fmt"
 	"io"
 
 	"github.com/llir/llvm/ir"
@@ -16,6 +17,7 @@ type Generator struct {
 	m          *ir.Module
 	funcStack  Stack[ir.Func]
 	blockStack Stack[ir.Block]
+	blockCount int // counter for block id.
 }
 
 func Run(w io.Writer, tree ast.AST) error {
@@ -46,6 +48,7 @@ func (g *Generator) walk(node ast.AST) error {
 		g.funcStack.Push(fn)
 
 		blk := g.funcStack.Top().NewBlock("")
+		g.blockCount = 0
 		g.blockStack.Push(blk)
 		var val value.Value
 		for _, node := range nd.Body {
@@ -99,6 +102,8 @@ func (g *Generator) expr(node ast.Expr) (value.Value, error) {
 		}
 		return val, nil
 	case *ast.IfExpr:
+		g.blockCount++
+		count := g.blockCount
 		cond := nd.Cond.(ast.Expr)
 
 		// gen cond node
@@ -111,9 +116,9 @@ func (g *Generator) expr(node ast.Expr) (value.Value, error) {
 		condV = topBlock.NewICmp(enum.IPredNE, condV, constant.NewInt(types.I32, 0))
 
 		// branch
-		thenBlock := topBlock.Parent.NewBlock("then")
-		elsBlock := topBlock.Parent.NewBlock("els")
-		mergeBlock := topBlock.Parent.NewBlock("ifcont")
+		thenBlock := topBlock.Parent.NewBlock(fmt.Sprintf("then%d", count))
+		elsBlock := topBlock.Parent.NewBlock(fmt.Sprintf("els%d", count))
+		mergeBlock := topBlock.Parent.NewBlock(fmt.Sprintf("ifcont%d", count))
 		topBlock.NewCondBr(condV, thenBlock, elsBlock)
 
 		// gen then node
@@ -123,9 +128,7 @@ func (g *Generator) expr(node ast.Expr) (value.Value, error) {
 		if err != nil {
 			return nil, err
 		}
-		if br := g.blockStack.Pop(); br != thenBlock {
-			return nil, errors.New("different block popped")
-		}
+		thenBlock = g.blockStack.Pop()
 		thenBlock.NewBr(mergeBlock)
 
 		// gen else node
@@ -143,9 +146,7 @@ func (g *Generator) expr(node ast.Expr) (value.Value, error) {
 				return nil, err
 			}
 		}
-		if br := g.blockStack.Pop(); br != elsBlock {
-			return nil, errors.New("different block popped")
-		}
+		elsBlock = g.blockStack.Pop()
 		elsBlock.NewBr(mergeBlock)
 
 		// gen merge block
